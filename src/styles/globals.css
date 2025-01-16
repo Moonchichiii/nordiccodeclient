@@ -1,0 +1,160 @@
+/* globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+@layer base {
+    :root {
+        --z-negative: -1;
+        --z-normal: 1;
+        --z-tooltip: 10;
+        --z-fixed: 100;
+        --z-modal: 1000;
+    }
+
+    html {
+        @apply antialiased;
+        scroll-behavior: smooth;
+    }
+    
+    body {
+        @apply font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-200 m-0 p-0 overflow-x-hidden;
+        box-sizing: border-box;
+    }
+
+    #root {
+        @apply isolate min-h-screen;
+    }
+
+    a {
+        @apply text-brand-primary-500 hover:text-brand-primary-600;
+        text-decoration: none;
+    }
+
+    button {
+        @apply cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary-500;
+    }
+}
+
+/* Animations */
+@layer utilities {
+    /* Float Animation */
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    /* Fade In Animation */
+    @keyframes animate-in {
+        to {
+            @apply opacity-100 translate-y-0;
+        }
+    }
+
+    .animate-in {
+        @apply opacity-0 translate-y-4;
+        animation: animate-in 0.6s ease-out forwards;
+    }
+
+    /* Visual Effects */
+    .backdrop-blur-modal {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .gradient-mask-b {
+        mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    }
+
+    /* Added utilities */
+    .dot {
+        @apply inline-block;
+        animation: dotPulse 1.5s infinite;
+    }
+    
+    @keyframes dotPulse {
+        0%, 100% {
+            opacity: 0.4;
+        }
+        50% {
+            opacity: 1;
+        }
+    }
+}
+
+/* Custom components */
+@layer components {
+    .gradient-text {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-200;
+    }
+
+    .glass-bg {
+        @apply bg-white/5 backdrop-blur-lg;
+    }
+    
+    .interactive-button {
+        @apply transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-yellow-500/50;
+    }
+
+    .section-container {
+        @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+    }
+
+    .card-shadow {
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1),
+                                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .nav-blur {
+        @apply bg-gray-900/80 backdrop-blur-md;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Added components */
+    .loading-dot {
+        @apply inline-block w-1 h-1 mx-0.5 rounded-full bg-yellow-500;
+    }
+}
+
+/* GSAP and Scroll Utilities */
+.gsap-reveal {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.smooth-scroll {
+    @apply will-change-transform;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+/* Z-index Utilities */
+.z-nav {
+    z-index: var(--z-fixed);
+}
+
+.z-modal {
+    z-index: var(--z-modal);
+}
+
+/* Layout Utilities */
+.scroll-container {
+    @apply relative w-full overflow-x-hidden;
+}
