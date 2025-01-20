@@ -49,23 +49,9 @@
     />
 
     <!-- Favicon & PWA Manifest -->
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/src/assets/fav/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/src/assets/fav/favicon-16x16.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/src/assets/fav/apple-touch-icon.png"
-    />
+    <link rel="icon" type="image/png" sizes="32x32" href="/src/assets/fav/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/src/assets/fav/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/src/assets/fav/apple-touch-icon.png" />
     <link rel="manifest" href="/src/assets/fav/site.webmanifest" />
     <meta name="theme-color" content="#ffffff" />
 
@@ -79,7 +65,7 @@
         "@type": "Organization",
         "name": "Nordic Code Works",
         "url": "https://nordiccodeworks.com",
-        "logo": "https://nordiccodeworks.com/assets/og-image.png",
+        "logo": "https://nordiccodeworks.com/assets/images/applogo.png",
         "description": "Build affordable, professional, and modern full-stack web applications with Nordic Code Works.",
         "contactPoint": {
           "@type": "ContactPoint",          
@@ -91,7 +77,6 @@
     </script>
 
     <!-- Preconnects & Google Fonts -->
-    <!-- (Optional) Improves performance for loading fonts and reduces DNS lookups. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -99,36 +84,11 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
     />
 
-    <!-- Prevent FOUC (Flash Of Unstyled Content) -->
-    <!-- WARNING: This hides the body until DOMContentLoaded, so weigh it carefully. -->
-    <style>
-      body {
-        visibility: hidden;
-      }
-    </style>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        document.body.style.visibility = "visible";
-      });
-    </script>
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
-
   <body>
-    <header role="banner" aria-label="Main Navigation">
-      <!-- Hidden H1 for SEO/Accessibility; ensures there's a textual main heading -->
-      <h1 style="display: none;">Nordic Code Works | Full-Stack Web Solutions</h1>
-    </header>
-
-    <main role="main">
-      <!-- React App Mount Point -->
-      <div id="root"></div>
-    </main>
-
-    <footer role="contentinfo">
-      <p>&copy; 2024 Nordic Code Works. All rights reserved.</p>
-    </footer>
-
-    <!-- Your Vite-React entry file -->
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

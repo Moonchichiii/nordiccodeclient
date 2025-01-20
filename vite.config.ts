@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
-import path from 'path'
-import tailwindcss from 'tailwindcss'
-import autoprefixer from 'autoprefixer'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+import path from 'path';
+import tailwindcss from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
 
 export default defineConfig({
   plugins: [react()],
@@ -35,21 +35,49 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        ws: true,
+        configure: (proxy, options) => {
+          proxy.on('error', (err, req, res) => {
+            console.log('proxy error', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            console.log('Sending Request to the Target:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+          });
+        },
       },
       '/auth': {
-        target: 'http://localhost:8000',
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
+      '/accounts': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
+      '/admin': {
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
       },
-      '/accounts': {
-        target: 'http://localhost:8000',
+      '/static': {
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
-      }
+      },
+      '/media': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
   build: {
@@ -88,4 +116,4 @@ export default defineConfig({
   esbuild: {
     logOverride: { 'this-is-undefined-in-esm': 'silent' },
   },
-})
+});

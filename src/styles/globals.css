@@ -39,6 +39,12 @@
 
 /* Animations */
 @layer utilities {
+    .writing-mode-vertical {
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        transform: rotate(180deg);
+      }
+    
     /* Float Animation */
     @keyframes float {
         0%, 100% {
@@ -75,10 +81,10 @@
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .gradient-mask-b {
+    /* .gradient-mask-b {
         mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
         -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-    }
+    } */
 
     /* Added utilities */
     .dot {
@@ -102,9 +108,9 @@
         @apply bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-200;
     }
 
-    .glass-bg {
+    /* .glass-bg {
         @apply bg-white/5 backdrop-blur-lg;
-    }
+    } */
     
     .interactive-button {
         @apply transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-yellow-500/50;
@@ -120,30 +126,82 @@
                                 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
 
-    .nav-blur {
+    /* .nav-blur {
         @apply bg-gray-900/80 backdrop-blur-md;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
+    } */
 
     /* Added components */
     .loading-dot {
         @apply inline-block w-1 h-1 mx-0.5 rounded-full bg-yellow-500;
     }
+
+    .writing-mode-vertical {
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+    }
+
+    .logo-container {
+        display: grid;
+        place-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Logo specific animations */
+    @keyframes logoFloat {
+        0%, 100% {
+            transform: translateY(0) rotate(-180deg);
+        }
+        50% {
+            transform: translateY(-0.5rem) rotate(-180deg);
+        }
+    }
+
+    @keyframes logoScaleWave {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.02);
+        }
+    }
+
+    .logo-text {
+        isolation: isolate;
+        transition: text-shadow 0.3s ease;
+    }
+
+    .logo-text:hover {
+        text-shadow: 0 0 2rem theme('colors.yellow.500 / 30%');
+    }
+
+    /* Logo responsive adjustments */
+    @media (min-width: theme('screens.md')) {
+        .logo-container {
+            gap: 0.75rem;
+        }
+    }
+
+    @media (min-width: theme('screens.lg')) {
+        .logo-container {
+            gap: 1rem;
+        }
+    }
 }
 
 /* GSAP and Scroll Utilities */
-.gsap-reveal {
+/* .gsap-reveal {
     opacity: 0;
     visibility: hidden;
-}
-
+} */
+/* 
 .smooth-scroll {
     @apply will-change-transform;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     transform-style: preserve-3d;
     backface-visibility: hidden;
-}
+} */
 
 /* Z-index Utilities */
 .z-nav {
