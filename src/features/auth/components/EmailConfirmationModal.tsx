@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { toast } from 'react-toastify';
+import { authApi } from '../api/auth.api';
 
 const EmailConfirmationModal = () => {
   const [countdown, setCountdown] = useState(60);
@@ -45,22 +47,6 @@ const EmailConfirmationModal = () => {
     }
   };
 
-  const handleVerificationSuccess = async () => {
-    setStatus('verified');
-    const email = localStorage.getItem('pendingVerificationEmail');
-    const password = localStorage.getItem('pendingVerificationPassword');
-    
-    if (email && password) {
-      try {
-        await login.mutateAsync({ email, password });
-        localStorage.removeItem('pendingVerificationEmail');
-        localStorage.removeItem('pendingVerificationPassword');
-        setTimeout(() => navigate('/dashboard'), 1500);
-      } catch (error) {
-        setStatus('error');
-      }
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
