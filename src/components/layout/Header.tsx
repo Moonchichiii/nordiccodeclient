@@ -59,6 +59,7 @@ AuthButton.displayName = 'AuthButton';
 
 const Header: React.FC<HeaderProps> = ({ timeTheme, setTimeTheme, isScrollingUp }) => {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -111,6 +112,11 @@ const Header: React.FC<HeaderProps> = ({ timeTheme, setTimeTheme, isScrollingUp 
         );
     };
 
+    const openAuthModal = (mode: 'login' | 'register') => {
+        setAuthMode(mode);
+        setIsAuthModalOpen(true);
+    };
+
     return (
         <>
             <header
@@ -151,50 +157,50 @@ const Header: React.FC<HeaderProps> = ({ timeTheme, setTimeTheme, isScrollingUp 
                         </div>
 
                         <div className="hidden md:flex items-center justify-between flex-1 pl-8">
-    <nav className="flex items-center gap-4">
-        {user && (
-            <NavLink href="/dashboard">Dashboard</NavLink>
-        )}
-        <NavLink href="/services">Services</NavLink>
-        <NavLink href="/portfolio">Portfolio</NavLink>
-        <NavLink href="/contact">Contact</NavLink>
-    </nav>
+                            <nav className="flex items-center gap-4">
+                                {user && (
+                                    <NavLink href="/dashboard">Dashboard</NavLink>
+                                )}
+                                <NavLink href="/services">Services</NavLink>
+                                <NavLink href="/portfolio">Portfolio</NavLink>
+                                <NavLink href="/contact">Contact</NavLink>
+                            </nav>
 
-    <div className="flex items-center gap-4">
-        <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg border border-gray-700/50 
-            hover:border-yellow-500/30 transition-all duration-300 
-            focus:outline-none focus-visible:ring-2 
-            focus-visible:ring-yellow-500/50 active:bg-gray-800"
-        >
-            {timeTheme === 'night' ? (
-                <Sun className="w-4 h-4 text-gray-400" />
-            ) : (
-                <Moon className="w-4 h-4 text-gray-400" />
-            )}
-        </button>
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={toggleTheme}
+                                    className="p-2 rounded-lg border border-gray-700/50 
+                                    hover:border-yellow-500/30 transition-all duration-300 
+                                    focus:outline-none focus-visible:ring-2 
+                                    focus-visible:ring-yellow-500/50 active:bg-gray-800"
+                                >
+                                    {timeTheme === 'night' ? (
+                                        <Sun className="w-4 h-4 text-gray-400" />
+                                    ) : (
+                                        <Moon className="w-4 h-4 text-gray-400" />
+                                    )}
+                                </button>
 
-        {user ? (
-            <AuthButton onClick={() => logout.mutate()}>
-                Sign Out
-            </AuthButton>
-        ) : (
-            <div className="flex items-center gap-3">
-                <AuthButton onClick={() => setIsAuthModalOpen(true)}>
-                    Sign In
-                </AuthButton>
-                <AuthButton
-                    onClick={() => setIsAuthModalOpen(true)}
-                    variant="solid"
-                >
-                    <LogIn className="w-4 h-4" />
-                    Sign Up
-                </AuthButton>
-            </div>
-        )}
-    </div>
-</div>
+                                {user ? (
+                                    <AuthButton onClick={() => logout.mutate()}>
+                                        Sign Out
+                                    </AuthButton>
+                                ) : (
+                                    <div className="flex items-center gap-3">
+                                        <AuthButton onClick={() => openAuthModal('login')}>
+                                            Sign In
+                                        </AuthButton>
+                                        <AuthButton
+                                            onClick={() => openAuthModal('register')}
+                                            variant="solid"
+                                        >
+                                            <LogIn className="w-4 h-4" />
+                                            Sign Up
+                                        </AuthButton>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Mobile Menu */}
@@ -208,81 +214,82 @@ const Header: React.FC<HeaderProps> = ({ timeTheme, setTimeTheme, isScrollingUp 
                                 : '-translate-y-4 opacity-0 pointer-events-none'
                         }`}
                     >
-                    <div className="p-4 space-y-6">
-                    <nav className="flex flex-col gap-2">
-                        {user && (
-                            <NavLink href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                                Dashboard
-                            </NavLink>
-                        )}
-                        <NavLink href="/services" onClick={() => setIsMobileMenuOpen(false)}>
-                            Services
-                        </NavLink>
-                        <NavLink href="/portfolio" onClick={() => setIsMobileMenuOpen(false)}>
-                            Portfolio
-                        </NavLink>
-                        <NavLink href="/contact" onClick={() => setIsMobileMenuOpen(false)}>
-                            Contact
-                        </NavLink>
-                    </nav>
+                        <div className="p-4 space-y-6">
+                            <nav className="flex flex-col gap-2">
+                                {user && (
+                                    <NavLink href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                                        Dashboard
+                                    </NavLink>
+                                )}
+                                <NavLink href="/services" onClick={() => setIsMobileMenuOpen(false)}>
+                                    Services
+                                </NavLink>
+                                <NavLink href="/portfolio" onClick={() => setIsMobileMenuOpen(false)}>
+                                    Portfolio
+                                </NavLink>
+                                <NavLink href="/contact" onClick={() => setIsMobileMenuOpen(false)}>
+                                    Contact
+                                </NavLink>
+                            </nav>
 
-                    <div className="pt-4 border-t border-gray-800/50 space-y-4">
-                    <div className="flex items-center justify-between">
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 rounded-lg border border-gray-700/50 
-                            hover:border-yellow-500/30 transition-all duration-300"
-                        >
-                            {timeTheme === 'night' ? (
-                                <Sun className="w-4 h-4 text-gray-400" />
-                            ) : (
-                                <Moon className="w-4 h-4 text-gray-400" />
-                            )}
-                        </button>
-                    </div>
-            
-                    {user ? (
-                        <AuthButton
-                            onClick={() => {
-                                logout.mutate();
-                                setIsMobileMenuOpen(false);
-                            }}
-                            className="w-full"
-                        >
-                            Sign Out
-                        </AuthButton>
-                    ) : (
-                        <div className="flex flex-col gap-3">
-                            <AuthButton
-                                onClick={() => {
-                                    setIsAuthModalOpen(true);
-                                    setIsMobileMenuOpen(false);
-                                }}
-                                className="w-full"
-                            >
-                                Sign In
-                            </AuthButton>
-                            <AuthButton
-                                onClick={() => {
-                                    setIsAuthModalOpen(true);
-                                    setIsMobileMenuOpen(false);
-                                }}
-                                variant="solid"
-                                className="w-full"
-                            >
-                                <LogIn className="w-4 h-4" />
-                                Sign Up
-                            </AuthButton>
+                            <div className="pt-4 border-t border-gray-800/50 space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <button
+                                        onClick={toggleTheme}
+                                        className="p-2 rounded-lg border border-gray-700/50 
+                                        hover:border-yellow-500/30 transition-all duration-300"
+                                    >
+                                        {timeTheme === 'night' ? (
+                                            <Sun className="w-4 h-4 text-gray-400" />
+                                        ) : (
+                                            <Moon className="w-4 h-4 text-gray-400" />
+                                        )}
+                                    </button>
+                                </div>
+                        
+                                {user ? (
+                                    <AuthButton
+                                        onClick={() => {
+                                            logout.mutate();
+                                            setIsMobileMenuOpen(false);
+                                        }}
+                                        className="w-full"
+                                    >
+                                        Sign Out
+                                    </AuthButton>
+                                ) : (
+                                    <div className="flex flex-col gap-3">
+                                        <AuthButton
+                                            onClick={() => {
+                                                openAuthModal('login');
+                                                setIsMobileMenuOpen(false);
+                                            }}
+                                            className="w-full"
+                                        >
+                                            Sign In
+                                        </AuthButton>
+                                        <AuthButton
+                                            onClick={() => {
+                                                openAuthModal('register');
+                                                setIsMobileMenuOpen(false);
+                                            }}
+                                            variant="solid"
+                                            className="w-full"
+                                        >
+                                            <LogIn className="w-4 h-4" />
+                                            Sign Up
+                                        </AuthButton>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    )}
-                </div>
-            </div>
                     </div>
                 </nav>
             </header>
 
             <AuthModal
                 isOpen={isAuthModalOpen}
+                initialMode={authMode}
                 onClose={() => setIsAuthModalOpen(false)}
                 onSuccess={() => setIsAuthModalOpen(false)}
             />

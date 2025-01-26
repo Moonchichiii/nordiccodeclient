@@ -1,9 +1,9 @@
-import React, { useState, ForwardedRef } from 'react';
+import React, { useState, useEffect, ForwardedRef } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { 
-    X, Mail, Lock, User, Eye, EyeOff, 
-    ChevronRight, ArrowLeft, Phone, MapPin, Globe, Building, Loader2 
+import {
+    X, Mail, Lock, User, Eye, EyeOff,
+    ChevronRight, ArrowLeft, Phone, MapPin, Globe, Building, Loader2
 } from 'lucide-react';
 import { z } from 'zod';
 import { useAuth } from '../hooks/useAuth';
@@ -11,7 +11,6 @@ import type { AuthMode } from '../types/auth.types';
 import GoogleSignInButton from '@/features/auth/components/GoogleSignInButton';
 import { toast } from 'react-toastify';
 
-// Form Schemas
 const loginSchema = z.object({
     email: z.string().email('Invalid email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -27,10 +26,10 @@ const registerSchema = z.object({
     city: z.string().min(1, 'City is required'),
     postal_code: z.string().min(1, 'Postal code is required'),
     country: z.string().min(1, 'Country is required'),
-    accepted_terms: z.boolean().refine((val) => val, 'Terms must be accepted'),
+    accepted_terms: z.boolean().refine(val => val, 'Terms must be accepted'),
     marketing_consent: z.boolean().optional().default(false),
     vat_number: z.string().max(50).optional(),
-}).refine((data) => data.password1 === data.password2, {
+}).refine(data => data.password1 === data.password2, {
     message: "Passwords don't match",
     path: ['password2'],
 });
@@ -54,15 +53,17 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
         <div className="space-y-1">
             <label className="text-sm font-medium text-gray-300">{label}</label>
             <div className="relative group">
-                <Icon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 
-                               group-focus-within:text-yellow-500/70 transition-colors duration-300" />
+                <Icon
+                    className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400
+                                         group-focus-within:text-yellow-500/70 transition-colors duration-300"
+                />
                 <input
                     ref={ref}
                     {...props}
                     className={`w-full bg-gray-800/50 text-white border rounded-lg py-2 pl-8 pr-2.5 
                     placeholder-gray-500 transition-all duration-300 text-sm
-                    ${error ? 'border-red-500/50 focus:border-red-500' : 
-                    'border-gray-700/50 focus:border-yellow-500/30 focus:ring-1 focus:ring-yellow-500/20'}`}
+                    ${error ? 'border-red-500/50 focus:border-red-500'
+                                     : 'border-gray-700/50 focus:border-yellow-500/30 focus:ring-1 focus:ring-yellow-500/20'}`}
                 />
             </div>
             {error && <p className="text-red-500 text-xs">{error}</p>}
@@ -72,14 +73,20 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
 
 interface AuthModalProps {
     isOpen: boolean;
+    initialMode: 'login' | 'register';
     onClose: () => void;
     onSuccess?: () => void;
 }
 
 type FormData = LoginForm | RegisterForm | ResetForm;
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => {
-    const [mode, setMode] = useState<AuthMode>('login');
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClose, onSuccess }) => {
+    const [mode, setMode] = useState<AuthMode>(initialMode);
+
+    useEffect(() => {
+        setMode(initialMode);
+    }, [initialMode]);
+
     const [showPassword, setShowPassword] = useState(false);
     const { login, register: registerUser, resetPassword } = useAuth();
     const [showVerification, setShowVerification] = useState(false);
@@ -93,15 +100,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
         setError,
     } = useForm<FormData>({
         resolver: zodResolver(
-            mode === 'login' 
-                ? loginSchema 
-                : mode === 'register' 
-                    ? registerSchema 
-                    : resetSchema
+            mode === 'login'
+                ? loginSchema
+                : mode === 'register'
+                ? registerSchema
+                : resetSchema
         ),
     });
 
-    const handleAuthSubmit = async (data: FormData) => {
+    const handleAuthSubmit: SubmitHandler<FormData> = async (data) => {
         try {
             switch (mode) {
                 case 'login':
@@ -128,7 +135,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
             }
         } catch (error: any) {
             if (error.validation) {
-                Object.entries(error.validation).forEach(([key, value]) => 
+                Object.entries(error.validation).forEach(([key, value]) =>
                     setError(key as keyof FormData, { message: value as string })
                 );
             } else if (error.email?.includes('exists')) {
@@ -159,18 +166,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
         <div className="fixed inset-0 z-[100] overflow-y-auto">
             <div className="min-h-screen px-4 flex items-center justify-center">
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
-                
-                <div className={`relative w-full transform overflow-hidden rounded-xl 
-                    bg-gray-900 p-4 shadow-xl transition-all duration-500 ease-out
-                    ${mode === 'register' ? 'max-w-3xl' : 'max-w-md'}`}
+
+                <div
+                    className={`relative w-full transform overflow-hidden rounded-xl 
+                        bg-gray-900 p-4 shadow-xl transition-all duration-500 ease-out
+                        ${mode === 'register' ? 'max-w-3xl' : 'max-w-md'}`}
                     style={{
                         boxShadow: '0 0 50px rgba(0, 0, 0, 0.5)',
                         transform: mode === 'register' ? 'translateX(0)' : 'none'
-                    }}>
+                    }}
+                >
                     <button
                         onClick={onClose}
                         className="absolute right-4 top-4 p-1 rounded-lg hover:bg-gray-800/50 
-                        transition-all duration-300"
+                                             transition-all duration-300"
                     >
                         <X className="h-4 w-4 text-gray-400" />
                     </button>
@@ -179,7 +188,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
                         <button
                             onClick={() => handleModeChange('login')}
                             className="absolute left-4 top-4 p-1 rounded-lg hover:bg-gray-800/50
-                            transition-all duration-300 group"
+                                                 transition-all duration-300 group"
                         >
                             <ArrowLeft className="h-4 w-4 text-gray-400" />
                         </button>
@@ -187,14 +196,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
 
                     <div className="text-center mb-4">
                         <h3 className="text-lg font-semibold bg-gradient-to-r from-yellow-500 to-yellow-200 bg-clip-text text-transparent">
-                            {mode === 'login' ? 'Welcome Back' : 
-                             mode === 'register' ? 'Create Account' : 
-                             'Reset Password'}
+                            {mode === 'login'
+                                ? 'Welcome Back'
+                                : mode === 'register'
+                                ? 'Create Account'
+                                : 'Reset Password'}
                         </h3>
-                        <p className="mt-1 text-sm text-gray-400"> 
-                            {mode === 'login' ? 'Sign in to continue to your account' :
-                             mode === 'register' ? 'Fill in your details to create an account' :
-                             'Enter your email to receive a reset link'}
+                        <p className="mt-1 text-sm text-gray-400">
+                            {mode === 'login'
+                                ? 'Sign in to continue to your account'
+                                : mode === 'register'
+                                ? 'Fill in your details to create an account'
+                                : 'Enter your email to receive a reset link'}
                         </p>
                     </div>
 
@@ -234,12 +247,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
                                                 type="button"
                                                 onClick={() => setShowPassword(!showPassword)}
                                                 className="absolute right-2.5 top-[34px] text-gray-400 hover:text-yellow-500 
-                                                transition-colors duration-300"
+                                                                     transition-colors duration-300"
                                             >
-                                                {showPassword ? 
-                                                    <EyeOff className="h-4 w-4" /> : 
-                                                    <Eye className="h-4 w-4" />
-                                                }
+                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                             </button>
                                         </div>
                                         <InputField
@@ -309,7 +319,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
                                                 type="checkbox"
                                                 {...register('accepted_terms')}
                                                 className="mt-1 w-4 h-4 rounded border-gray-700 bg-gray-800 text-yellow-500
-                                                focus:ring-yellow-500/20 focus:ring-offset-0"
+                                                                     focus:ring-yellow-500/20 focus:ring-offset-0"
                                             />
                                             <span className="text-sm text-gray-400">
                                                 I accept the terms and conditions
@@ -324,7 +334,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
                                                 type="checkbox"
                                                 {...register('marketing_consent')}
                                                 className="mt-1 w-4 h-4 rounded border-gray-700 bg-gray-800 text-yellow-500
-                                                focus:ring-yellow-500/20 focus:ring-offset-0"
+                                                                     focus:ring-yellow-500/20 focus:ring-offset-0"
                                             />
                                             <span className="text-sm text-gray-400">
                                                 I agree to receive marketing communications
@@ -357,12 +367,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
                                                 type="button"
                                                 onClick={() => setShowPassword(!showPassword)}
                                                 className="absolute right-3 top-[38px] text-gray-400 hover:text-yellow-500 
-                                                transition-colors duration-300"
+                                                                     transition-colors duration-300"
                                             >
-                                                {showPassword ? 
-                                                    <EyeOff className="h-4 w-4" /> : 
-                                                    <Eye className="h-4 w-4" />
-                                                }
+                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                             </button>
                                         </div>
                                     )}
@@ -373,14 +380,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
                                 type="submit"
                                 disabled={isSubmitting}
                                 className="w-full py-2 rounded-lg bg-yellow-500 text-gray-900 font-medium text-sm
-                                hover:bg-yellow-400 transition-colors duration-300 mt-6 disabled:opacity-50
-                                disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                                                     hover:bg-yellow-400 transition-colors duration-300 mt-6 disabled:opacity-50
+                                                     disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                             >
                                 <span>
-                                    {isSubmitting ? 'Processing...' :
-                                    mode === 'login' ? 'Sign In' :
-                                    mode === 'register' ? 'Create Account' :
-                                    'Send Reset Link'}
+                                    {isSubmitting
+                                        ? 'Processing...'
+                                        : mode === 'login'
+                                        ? 'Sign In'
+                                        : mode === 'register'
+                                        ? 'Create Account'
+                                        : 'Send Reset Link'}
                                 </span>
                                 <ChevronRight className="w-4 h-4" />
                             </button>
@@ -395,7 +405,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
                                             <span className="px-2 bg-gray-900 text-gray-400">Or continue with</span>
                                         </div>
                                     </div>
-                                    
+
                                     <GoogleSignInButton onSuccess={onSuccess} onClose={onClose} />
                                 </>
                             )}
