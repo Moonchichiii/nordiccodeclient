@@ -1,5 +1,10 @@
 import apiClient from '@/lib/axios';
-import type { LoginCredentials, RegisterCredentials, AuthResponse } from '../types';
+import type {
+  AuthResponse,
+  RegisterResponse,
+  LoginCredentials,
+  RegisterCredentials,
+} from '../types/auth.types';
 
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
@@ -7,54 +12,46 @@ export const authApi = {
       const { data } = await apiClient.post<AuthResponse>('/api/auth/login/', credentials);
       return data;
     } catch (error: any) {
-      const errors = error.response?.data;
-      throw {
-        email: errors?.email?.[0],
-        password: errors?.password?.[0], 
-        verification: errors?.non_field_errors?.[0]?.includes('verify') 
-          ? 'Please verify your email first'
-          : null,
-        general: errors?.detail || 'Login failed'
-      };
+      throw new Error(error.response?.data?.detail || 'Failed to login');
     }
   },
 
-  register: async (credentials: RegisterCredentials): Promise<AuthResponse> => {
+  register: async (credentials: RegisterCredentials): Promise<RegisterResponse> => {
     try {
-      const { data } = await apiClient.post<AuthResponse>('/api/auth/registration/', credentials);
+      const { data } = await apiClient.post<RegisterResponse>(
+        '/api/auth/registration/',
+        credentials
+      );
       return data;
     } catch (error: any) {
-      const errors = error.response?.data;
-      throw {
-        email: errors?.email?.[0],
-        password1: errors?.password1?.[0],
-        password2: errors?.password2?.[0],
-        full_name: errors?.full_name?.[0],
-        phone_number: errors?.phone_number?.[0],
-        address: errors?.address?.[0],
-        accepted_terms: errors?.accepted_terms?.[0],
-        general: errors?.detail || 'Registration failed',
-        validation: errors?.non_field_errors?.[0]
-      };
+      const errData = error.response?.data;
+      const detail =
+        errData?.detail ||
+        errData?.non_field_errors?.[0] ||
+        JSON.stringify(errData) ||
+        'Registration failed';
+      throw new Error(detail);
     }
   },
 
-  verifyEmail: async (key: string): Promise<void> => {
+  logout: async () => {
+    await apiClient.post('/api/auth/logout/');
+  },
+
+  verifyEmail: async (key: string) => {
+    await apiClient.get(`/api/users/verify-email/${key}/`);
+  },
+
+  getCurrentUser: async () => {
     try {
-      await apiClient.get(`/api/users/verify-email/${key}/`);
-    } catch (error: any) {
-      throw {
-        verification: error.response?.data?.detail || 'Email verification failed',
-        expired: error.response?.data?.code === 'expired'
-      };
+      const { data } = await apiClient.get('/api/users/me/');
+      return data.user;
+    } catch {
+      return null;
     }
   },
 
-  resendVerificationEmail: async (email: string): Promise<void> => {
-    try {
-      await apiClient.post('/api/auth/registration/resend-email/', { email });
-    } catch (error: any) {
-      throw new Error(error.response?.data?.detail || 'Failed to resend verification email');
-    }
-  }
+  resendVerificationEmail: async (email: string) => {
+    await apiClient.post('/api/auth/registration/resend-email/', { email });
+  },
 };

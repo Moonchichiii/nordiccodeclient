@@ -126,19 +126,21 @@ const Header: React.FC<HeaderProps> = ({ timeTheme, setTimeTheme, isScrollingUp 
                     backdrop-blur-md bg-gray-900/80 border-b border-gray-800/50`}
             >
                 <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <RouterLink
-                            to="/"
-                            className="relative group focus:outline-none 
-                            focus-visible:ring-2 focus-visible:ring-yellow-500/50 rounded-lg"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                            <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 
-                            bg-clip-text text-transparent transition-all duration-300
-                            group-hover:from-yellow-400 group-hover:to-yellow-500">
-                                Nordic Code Works
-                            </span>
-                        </RouterLink>
+                <div className="flex justify-between items-center h-16">
+    {!user && (
+        <RouterLink
+            to="/"
+            className="relative group focus:outline-none 
+            focus-visible:ring-2 focus-visible:ring-yellow-500/50 rounded-lg"
+            onClick={() => setIsMobileMenuOpen(false)}
+        >
+            <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 
+            bg-clip-text text-transparent transition-all duration-300
+            group-hover:from-yellow-400 group-hover:to-yellow-500">
+                Nordic Code Works
+            </span>
+        </RouterLink>
+    )}
 
                         <div className="flex md:hidden">
                             <button

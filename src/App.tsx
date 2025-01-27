@@ -41,7 +41,7 @@ const App = (): ReactElement => {
                   <Route path="services" element={<Services />} />
                   <Route path="portfolio" element={<Portfolio />} />
                   <Route path="contact" element={<Contact />} />
-                  <Route path="confirm-email/:confirmation_key" element={<EmailConfirmationModal />} />
+<Route path="/verify-email/:key" element={<EmailConfirmationModal />} />
                   <Route
                     path="dashboard/*"
                     element={

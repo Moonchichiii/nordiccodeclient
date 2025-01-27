@@ -118,10 +118,10 @@ function Dashboard() {
                 </div>
 
                 <div className="px-4 py-6">
-                    <div className="space-y-1">
+                    <div className="space-y-3">
                         <NavButton icon={FolderCog} path="/dashboard/new-project">
                             <div className="flex items-center justify-between w-full">
-                                <span>Start Project</span>
+                                <span className="mr-2">Start Project</span>
                                 <span className="px-2 py-0.5 text-xs bg-yellow-500 text-gray-900 rounded-full">
                                     New
                                 </span>

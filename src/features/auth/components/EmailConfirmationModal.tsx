@@ -47,6 +47,26 @@ const EmailConfirmationModal = () => {
     }
   };
 
+  useEffect(() => {
+    const verifyEmail = async () => {
+      try {
+        const key = new URLSearchParams(window.location.search).get('key');
+        if (!key) return;
+  
+        await authApi.verifyEmail(key);
+        setStatus('verified');
+        
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 2000);
+      } catch (error) {
+        setStatus('error');
+      }
+    };
+  
+    verifyEmail();
+  }, [navigate]);
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
