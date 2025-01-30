@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { 
     Mail, Lock, User, Eye, EyeOff, 
@@ -7,9 +7,8 @@ import {
 } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { InputField } from '../shared/InputField';
+import { InputField } from '../components/shared/InputField';
 import { toast } from 'react-toastify';
-
 
 const registerSchema = z.object({
     email: z.string().email('Invalid email address'),
@@ -54,17 +53,19 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         resolver: zodResolver(registerSchema),
     });
 
-    const handleRegister = async (data: RegisterForm) => {
+    const handleRegister: SubmitHandler<RegisterForm> = async (data) => {
         try {
-            await registerUser.mutateAsync(data);
-            onRegistrationComplete(data.email);
-            reset();
+            const response = await registerUser.mutateAsync(data);
+            if (response) {
+                onRegistrationComplete(data.email);
+                reset();
+            }
         } catch (error: any) {
-            if (error.validation) {
-                Object.entries(error.validation).forEach(([key, value]) =>
+            if (error.response?.data?.validation) {
+                Object.entries(error.response.data.validation).forEach(([key, value]) =>
                     setError(key as keyof RegisterForm, { message: value as string })
                 );
-            } else if (error.email?.includes('exists')) {
+            } else if (error.response?.data?.email?.includes('exists')) {
                 setError('email', { message: 'Email already registered' });
             } else {
                 toast.error(error.message || 'Registration failed');

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { Mail, Lock, Eye, EyeOff, ChevronRight } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { InputField } from '../shared/InputField';
+import { InputField } from '@/features/auth/components/shared/InputField';
 import { toast } from 'react-toastify';
 
 const loginSchema = z.object({
@@ -12,7 +12,7 @@ const loginSchema = z.object({
     password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
-type LoginForm = z.infer<typeof loginSchema>;
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
     onSuccess?: () => void;
@@ -20,11 +20,7 @@ interface LoginFormProps {
     onModeChange: (mode: 'register' | 'forgot-password') => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ 
-    onSuccess, 
-    onClose,
-    onModeChange 
-}) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onClose, onModeChange }) => {
     const [showPassword, setShowPassword] = useState(false);
     const { login } = useAuth();
 
@@ -34,11 +30,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         formState: { errors, isSubmitting },
         reset,
         setError,
-    } = useForm<LoginForm>({
+    } = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
     });
 
-    const handleLogin = async (data: LoginForm) => {
+    const handleLogin: SubmitHandler<LoginFormValues> = async (data) => {
         try {
             await login.mutateAsync(data);
             reset();
@@ -47,7 +43,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         } catch (error: any) {
             if (error.validation) {
                 Object.entries(error.validation).forEach(([key, value]) =>
-                    setError(key as keyof LoginForm, { message: value as string })
+                    setError(key as keyof LoginFormValues, { message: value as string })
                 );
             } else {
                 toast.error(error.message || 'Login failed');
@@ -78,8 +74,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-[38px] text-gray-400 hover:text-yellow-500 
-                             transition-colors duration-300"
+                    className="absolute right-3 top-[38px] text-gray-400 hover:text-yellow-500 transition-colors duration-300"
                 >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -88,9 +83,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2 rounded-lg bg-yellow-500 text-gray-900 font-medium text-sm
-                         hover:bg-yellow-400 transition-colors duration-300 mt-6 disabled:opacity-50
-                         disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                className="w-full py-2 rounded-lg bg-yellow-500 text-gray-900 font-medium text-sm hover:bg-yellow-400 transition-colors duration-300 mt-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
                 <span>{isSubmitting ? 'Processing...' : 'Sign In'}</span>
                 <ChevronRight className="w-4 h-4" />
@@ -127,4 +120,4 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     );
 };
 
-export default LoginForm;
+export { LoginForm };

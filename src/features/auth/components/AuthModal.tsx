@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, ArrowLeft, Loader2 } from 'lucide-react';
 import type { AuthMode } from '@/features/auth/types/auth.types';
-import { LoginForm } from '@/features/auth/components/forms/LoginForm';
-import { RegisterForm } from '@/features/auth/components/forms/RegisterForm';
-import { ForgotPasswordForm } from '@/features/auth/components/forms/ForgotPasswordForm';
+import { LoginForm } from '../forms/LoginForm';
+import { RegisterForm } from '../forms/RegisterForm';
+import { ForgotPasswordForm } from '../forms/ForgotPasswordForm';
 import { GoogleSignInButton } from '@/features/auth/components/GoogleSignInButton';
 import { authApi } from '@/features/auth/api/auth.api';
 import { toast } from 'react-toastify';
@@ -134,7 +134,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                                         <div className="absolute inset-0 flex items-center">
                                             <div className="w-full border-t border-gray-700/50"></div>
                                         </div>
-                                        <div className="relative flex justify-center text-sm">
+                                        <div className="relative flex justify-center text-sm mb-4">
                                             <span className="px-2 bg-gray-900 text-gray-400">
                                                 Or continue with
                                             </span>

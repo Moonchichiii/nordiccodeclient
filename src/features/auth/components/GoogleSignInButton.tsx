@@ -7,13 +7,29 @@ interface GoogleSignInButtonProps {
     onClose?: () => void;
 }
 
+interface GoogleResponse {
+    credential: string;
+}
+
 declare global {
     interface Window {
         google: {
             accounts: {
                 id: {
-                    initialize: (config: any) => void;
-                    renderButton: (element: HTMLElement, config: any) => void;
+                    initialize: (config: {
+                        client_id: string;
+                        callback: (response: GoogleResponse) => void;
+                        ux_mode: 'popup';
+                    }) => void;
+                    renderButton: (element: HTMLElement, config: {
+                        type: 'standard';
+                        theme: 'filled_black' | 'outline';
+                        size: 'large';
+                        text: 'continue_with';
+                        shape: 'pill';
+                        logo_alignment: 'left';
+                        width: number;
+                    }) => void;
                     prompt: () => void;
                 };
             };
@@ -27,69 +43,70 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onSuccess, onCl
     const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     useEffect(() => {
-        // Load the Google Identity Services script
-        const loadGoogleScript = () => {
-            const script = document.createElement('script');
-            script.src = 'https://accounts.google.com/gsi/client';
-            script.async = true;
-            script.defer = true;
-            document.body.appendChild(script);
-
-            return new Promise<void>((resolve) => {
+        const loadGoogleScript = (): Promise<void> => {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://accounts.google.com/gsi/client';
+                script.async = true;
+                script.defer = true;
                 script.onload = () => resolve();
+                script.onerror = () => reject(new Error('Failed to load Google script'));
+                document.body.appendChild(script);
             });
         };
 
         const initializeGoogleSignIn = async () => {
-            await loadGoogleScript();
+            try {
+                await loadGoogleScript();
 
-            if (!window.google) return;
+                if (!window.google) return;
 
-            window.google.accounts.id.initialize({
-                client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-                callback: async (response) => {
-                    if (response.credential) {
-                        try {
-                            await login.mutateAsync({
-                                token: response.credential,
-                                provider: 'google'
-                            });
-                            onSuccess?.();
-                            onClose?.();
-                        } catch (error) {
-                            console.error('Google sign-in error:', error);
-                            toast.error('Failed to sign in with Google');
+                window.google.accounts.id.initialize({
+                    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID as string,
+                    callback: async (response: GoogleResponse) => {
+                        if (response.credential) {
+                            try {
+                                await login.mutateAsync({
+                                    token: response.credential,
+                                    provider: 'google'
+                                });
+                                onSuccess?.();
+                                onClose?.();
+                            } catch (error) {
+                                console.error('Google sign-in error:', error);
+                                toast.error('Failed to sign in with Google');
+                            }
                         }
-                    }
-                },
-                ux_mode: 'popup',
-            });
-
-            if (buttonRef.current) {
-                window.google.accounts.id.renderButton(buttonRef.current, {
-                    type: 'standard',
-                    theme: isDarkMode ? 'filled_black' : 'outline',
-                    size: 'large',
-                    text: 'continue_with',
-                    shape: 'pill',
-                    logo_alignment: 'left',
-                    width: buttonRef.current.offsetWidth,
+                    },
+                    ux_mode: 'popup',
                 });
+
+                if (buttonRef.current) {
+                    window.google.accounts.id.renderButton(buttonRef.current, {
+                        type: 'standard',
+                        theme: isDarkMode ? 'filled_black' : 'outline',
+                        size: 'large',
+                        text: 'continue_with',
+                        shape: 'pill',
+                        logo_alignment: 'left',
+                        width: buttonRef.current.offsetWidth,
+                    });
+                }
+            } catch (error) {
+                console.error('Error initializing Google Sign-In:', error);
             }
         };
 
         initializeGoogleSignIn();
 
-        // Cleanup
         return () => {
             const scriptElement = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
             if (scriptElement && scriptElement.parentNode) {
                 scriptElement.parentNode.removeChild(scriptElement);
             }
         };
-    }, [login, onSuccess, onClose]);
+    }, [login, onSuccess, onClose, isDarkMode]);
 
-    // Listen for dark mode changes
     useEffect(() => {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
         const handleChange = () => {
@@ -121,4 +138,4 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onSuccess, onCl
     );
 };
 
-export default GoogleSignInButton;
+export { GoogleSignInButton };

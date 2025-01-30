@@ -1,10 +1,10 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { Mail, ChevronRight } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { InputField } from '../shared/InputField';
+import { InputField } from '@/features/auth/components/shared/InputField';
 import { toast } from 'react-toastify';
 
 const resetSchema = z.object({
@@ -18,7 +18,7 @@ interface ForgotPasswordFormProps {
     onModeChange: (mode: 'login') => void;
 }
 
-export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
+const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
     onClose,
     onModeChange
 }) => {
@@ -34,7 +34,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
         resolver: zodResolver(resetSchema),
     });
 
-    const handleResetPassword = async (data: ResetForm) => {
+    const handleResetPassword: SubmitHandler<ResetForm> = async (data) => {
         try {
             await resetPassword.mutateAsync(data);
             toast.success('Password reset link sent to your email');
@@ -65,9 +65,9 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
             <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2 rounded-lg bg-yellow-500 text-gray-900 font-medium text-sm
-                         hover:bg-yellow-400 transition-colors duration-300 mt-6 disabled:opacity-50
-                         disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                className={`w-full py-2 rounded-lg bg-yellow-500 text-gray-900 font-medium text-sm
+                            hover:bg-yellow-400 transition-colors duration-300 mt-6 disabled:opacity-50
+                            disabled:cursor-not-allowed flex items-center justify-center space-x-2`}
             >
                 <span>{isSubmitting ? 'Processing...' : 'Send Reset Link'}</span>
                 <ChevronRight className="w-4 h-4" />
@@ -86,4 +86,4 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
     );
 };
 
-export default ForgotPasswordForm;
+export { ForgotPasswordForm };

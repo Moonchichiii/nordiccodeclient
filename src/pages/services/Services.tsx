@@ -3,7 +3,7 @@ import { ArrowUpRight, ChevronRight, Sparkles } from 'lucide-react';
 import { gsap } from 'gsap';
 import { useNavigate } from 'react-router-dom';
 
-const ServiceTier = ({ title, price, features, recommended = false, onSelect }) => (
+const ServiceTier = ({ title, priceEUR, priceSEK, features, recommended = false, onSelect }) => (
   <div 
     className="relative p-6 rounded-xl bg-gray-800/50 hover:bg-gray-800 
     transition-all duration-300"
@@ -20,9 +20,15 @@ const ServiceTier = ({ title, price, features, recommended = false, onSelect }) 
     <div className="space-y-6">
       <div>
         <h3 className="text-xl font-light text-white">{title}</h3>
-        <div className="mt-2 flex items-baseline">
-          <span className="text-3xl font-light text-white">{price}</span>
-          <span className="ml-2 text-sm text-gray-400">SEK</span>
+        <div className="mt-2">
+          <div className="flex items-baseline">
+            <span className="text-3xl font-light text-white">{priceEUR}</span>
+            <span className="ml-2 text-sm text-gray-400">EUR</span>
+          </div>
+          <div className="flex items-baseline mt-1">
+            <span className="text-lg font-light text-gray-400">{priceSEK}</span>
+            <span className="ml-2 text-xs text-gray-500">SEK</span>
+          </div>
         </div>
       </div>
       <ul className="space-y-3 text-sm border-t border-gray-700/30 pt-6" role="list">
@@ -83,7 +89,8 @@ const Services = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <ServiceTier
               title="Static Frontend"
-              price="6,300"
+              priceEUR="600"
+              priceSEK="6,300"
               features={[
                 'React with Vite',
                 'Modern responsive design',
@@ -93,7 +100,8 @@ const Services = () => {
             />
             <ServiceTier
               title="Full Stack"
-              price="11,200"
+              priceEUR="1,100"
+              priceSEK="11,200"
               recommended={true}
               features={[
                 'Everything in Static Frontend',
@@ -104,7 +112,8 @@ const Services = () => {
             />
             <ServiceTier
               title="Enterprise"
-              price="20,200"
+              priceEUR="2,000"
+              priceSEK="20,200"
               features={[
                 'Everything in Full Stack',
                 'Advanced security features',

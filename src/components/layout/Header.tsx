@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef } from 'react';
 import { Sun, Moon, Menu, LogIn, X } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import AuthModal from '@/features/auth/components/AuthModal';
@@ -9,21 +9,22 @@ interface NavLinkProps {
     href: string;
     children: React.ReactNode;
     onClick?: () => void;
+    className?: string;
 }
 
 interface HeaderProps {
-    timeTheme: string;
-    setTimeTheme: React.Dispatch<React.SetStateAction<string>>;
+    timeTheme: 'day' | 'dawn' | 'night';
+    setTimeTheme: React.Dispatch<React.SetStateAction<'day' | 'dawn' | 'night'>>;
     isScrollingUp: boolean;
 }
 
-const NavLink = ({ href, children, onClick }: NavLinkProps) => (
+const NavLink: React.FC<NavLinkProps> = ({ href, children, onClick, className }) => (
     <RouterLink
         to={href}
         onClick={onClick}
-        className="group relative px-4 py-2 text-sm font-medium text-gray-300 hover:text-white 
+        className={`group relative px-4 py-2 text-sm font-medium text-gray-300 hover:text-white 
         transition-all duration-300 rounded-lg focus:outline-none focus-visible:ring-2 
-        focus-visible:ring-yellow-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+        focus-visible:ring-yellow-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${className}`}
     >
         <span className="relative z-10">{children}</span>
         <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/0 via-yellow-500/10 to-yellow-500/0 
@@ -34,7 +35,7 @@ const NavLink = ({ href, children, onClick }: NavLinkProps) => (
     </RouterLink>
 );
 
-const AuthButton = React.forwardRef<
+const AuthButton = forwardRef<
     HTMLButtonElement,
     React.ButtonHTMLAttributes<HTMLButtonElement> & {
         variant?: 'ghost' | 'solid';
@@ -126,21 +127,21 @@ const Header: React.FC<HeaderProps> = ({ timeTheme, setTimeTheme, isScrollingUp 
                     backdrop-blur-md bg-gray-900/80 border-b border-gray-800/50`}
             >
                 <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
-    {!user && (
-        <RouterLink
-            to="/"
-            className="relative group focus:outline-none 
-            focus-visible:ring-2 focus-visible:ring-yellow-500/50 rounded-lg"
-            onClick={() => setIsMobileMenuOpen(false)}
-        >
-            <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 
-            bg-clip-text text-transparent transition-all duration-300
-            group-hover:from-yellow-400 group-hover:to-yellow-500">
-                Nordic Code Works
-            </span>
-        </RouterLink>
-    )}
+                    <div className="flex justify-between items-center h-16">
+                        {!user && (
+                            <RouterLink
+                                to="/"
+                                className="relative group focus:outline-none 
+                                focus-visible:ring-2 focus-visible:ring-yellow-500/50 rounded-lg"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 
+                                bg-clip-text text-transparent transition-all duration-300
+                                group-hover:from-yellow-400 group-hover:to-yellow-500">
+                                    Nordic Code Works
+                                </span>
+                            </RouterLink>
+                        )}
 
                         <div className="flex md:hidden">
                             <button
@@ -217,19 +218,43 @@ const Header: React.FC<HeaderProps> = ({ timeTheme, setTimeTheme, isScrollingUp 
                         }`}
                     >
                         <div className="p-4 space-y-6">
-                            <nav className="flex flex-col gap-2">
+                            <nav className="flex flex-col gap-3">
                                 {user && (
-                                    <NavLink href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <NavLink 
+                                        href="/dashboard" 
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="px-4 py-3 text-base font-medium text-gray-300 hover:text-white 
+                                                 transition-all duration-300 rounded-lg focus:outline-none focus-visible:ring-2 
+                                                 focus-visible:ring-yellow-500/50"
+                                    >
                                         Dashboard
                                     </NavLink>
                                 )}
-                                <NavLink href="/services" onClick={() => setIsMobileMenuOpen(false)}>
+                                <NavLink 
+                                    href="/services" 
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="px-4 py-3 text-base font-medium text-gray-300 hover:text-white 
+                                             transition-all duration-300 rounded-lg focus:outline-none focus-visible:ring-2 
+                                             focus-visible:ring-yellow-500/50"
+                                >
                                     Services
                                 </NavLink>
-                                <NavLink href="/portfolio" onClick={() => setIsMobileMenuOpen(false)}>
+                                <NavLink 
+                                    href="/portfolio" 
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="px-4 py-3 text-base font-medium text-gray-300 hover:text-white 
+                                             transition-all duration-300 rounded-lg focus:outline-none focus-visible:ring-2 
+                                             focus-visible:ring-yellow-500/50"
+                                >
                                     Portfolio
                                 </NavLink>
-                                <NavLink href="/contact" onClick={() => setIsMobileMenuOpen(false)}>
+                                <NavLink 
+                                    href="/contact" 
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="px-4 py-3 text-base font-medium text-gray-300 hover:text-white 
+                                             transition-all duration-300 rounded-lg focus:outline-none focus-visible:ring-2 
+                                             focus-visible:ring-yellow-500/50"
+                                >
                                     Contact
                                 </NavLink>
                             </nav>
@@ -238,13 +263,14 @@ const Header: React.FC<HeaderProps> = ({ timeTheme, setTimeTheme, isScrollingUp 
                                 <div className="flex items-center justify-between">
                                     <button
                                         onClick={toggleTheme}
-                                        className="p-2 rounded-lg border border-gray-700/50 
-                                        hover:border-yellow-500/30 transition-all duration-300"
+                                        className="p-3 rounded-lg bg-gray-800 border border-gray-700 
+                                        hover:border-yellow-500/50 hover:bg-gray-700 transition-all duration-300
+                                        focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50"
                                     >
                                         {timeTheme === 'night' ? (
-                                            <Sun className="w-4 h-4 text-gray-400" />
+                                            <Sun className="w-5 h-5 text-yellow-400" />
                                         ) : (
-                                            <Moon className="w-4 h-4 text-gray-400" />
+                                            <Moon className="w-5 h-5 text-yellow-400" />
                                         )}
                                     </button>
                                 </div>
@@ -255,31 +281,37 @@ const Header: React.FC<HeaderProps> = ({ timeTheme, setTimeTheme, isScrollingUp 
                                             logout.mutate();
                                             setIsMobileMenuOpen(false);
                                         }}
-                                        className="w-full"
+                                        className="w-full text-sm font-medium py-2.5 rounded-xl"
                                     >
                                         Sign Out
                                     </AuthButton>
                                 ) : (
-                                    <div className="flex flex-col gap-3">
-                                        <AuthButton
-                                            onClick={() => {
-                                                openAuthModal('login');
-                                                setIsMobileMenuOpen(false);
-                                            }}
-                                            className="w-full"
-                                        >
-                                            Sign In
-                                        </AuthButton>
+                                    <div className="flex flex-col gap-2.5">
+                                      <AuthButton
+    onClick={() => {
+        openAuthModal('login');
+        setIsMobileMenuOpen(false);
+    }}
+    className="w-full bg-gray-800 text-gray-100 text-sm font-medium py-2.5 rounded-xl 
+             border border-gray-600 hover:border-gray-500
+             hover:bg-gray-700 flex items-center justify-center
+             shadow-sm shadow-black/20"
+>
+    Sign In
+</AuthButton>
                                         <AuthButton
                                             onClick={() => {
                                                 openAuthModal('register');
                                                 setIsMobileMenuOpen(false);
                                             }}
                                             variant="solid"
-                                            className="w-full"
+                                            className="w-full text-sm font-medium py-2.5 rounded-xl 
+                                                     bg-gradient-to-r from-yellow-500 to-yellow-400 
+                                                     hover:from-yellow-400 hover:to-yellow-300
+                                                     flex items-center justify-center gap-2"
                                         >
-                                            <LogIn className="w-4 h-4" />
-                                            Sign Up
+                                            <LogIn className="w-4 h-4 stroke-[2.5]" />
+                                            <span>Sign Up</span>
                                         </AuthButton>
                                     </div>
                                 )}

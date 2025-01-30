@@ -10,16 +10,18 @@ import ProtectedRoute from '@/features/auth/ProtectedRoute';
 import CookieConsent from '@/components/common/CookieConsent';
 import Home from '@/pages/home/Home';
 
-// Lazy loading utility
+interface LazyComponent<T> extends React.LazyExoticComponent<T> {
+  preload: () => Promise<{ default: T }>;
+}
+
 const lazyWithPrefetch = <T extends React.ComponentType<any>>(
   factory: () => Promise<{ default: T }>
-): React.LazyExoticComponent<T> & { preload: () => Promise<{ default: T }> } => {
-  const Component = lazy(factory);
-  (Component as any).preload = factory;
-  return Component as React.LazyExoticComponent<T> & { preload: () => Promise<{ default: T }> };
+): LazyComponent<T> => {
+  const Component = lazy(factory) as LazyComponent<T>;
+  Component.preload = factory;
+  return Component;
 };
 
-// Lazy loaded pages
 const Services = lazyWithPrefetch(() => import('@/pages/services/Services'));
 const Portfolio = lazyWithPrefetch(() => import('@/pages/portfolio/Portfolio'));
 const Contact = lazyWithPrefetch(() => import('@/pages/contact/Contact'));
@@ -41,7 +43,7 @@ const App = (): ReactElement => {
                   <Route path="services" element={<Services />} />
                   <Route path="portfolio" element={<Portfolio />} />
                   <Route path="contact" element={<Contact />} />
-<Route path="/verify-email/:key" element={<EmailConfirmationModal />} />
+                  <Route path="/verify-email/:key" element={<EmailConfirmationModal />} />
                   <Route
                     path="dashboard/*"
                     element={
@@ -50,15 +52,12 @@ const App = (): ReactElement => {
                       </ProtectedRoute>
                     }
                   >
-                    {/* Nested routes for dashboard */}
                     <Route path="settings" element={<Settings />} />
                   </Route>
                   <Route path="*" element={<NotFound />} />
                 </Route>
               </Routes>
             </Suspense>
-            
-            {/* Global Components */}
             <ToastContainer
               position="top-right"
               autoClose={3000}

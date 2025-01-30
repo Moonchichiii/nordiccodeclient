@@ -1,50 +1,70 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, Code, Laptop } from 'lucide-react';
+import { Package, Code, Laptop, LucideIcon } from 'lucide-react';
 
-const packages = [
+interface Package {
+  id: 'static' | 'mid_tier' | 'enterprise';
+  name: string;
+  icon: LucideIcon;
+  priceEUR: number;
+  priceSEK: number;
+  features: string[];
+}
+
+const packages: Package[] = [
   {
     id: 'static',
     name: 'Static Frontend Solution',
     icon: Package,
-    basePrice: 2999,
+    priceEUR: 1500,
+    priceSEK: 6300,
     features: [
-      'Responsive design',
-      'Up to 5 pages',
-      'Basic SEO optimization'
-    ]
+      'Professional developer-built React application',
+      'Custom responsive design implementation',
+      'Modern build setup with Vite',
+      'Performance optimization',
+      'Basic SEO configuration',
+      '14 days developer support',
+    ],
   },
   {
     id: 'mid_tier',
     name: 'Mid-Tier Solution',
     icon: Laptop,
-    basePrice: 4999,
+    priceEUR: 3500,
+    priceSEK: 11200,
     features: [
-      'Full stack application',
-      'Custom backend API',
-      'Database integration'
-    ]
+      'Everything in Static Frontend',
+      'Custom Django REST API development',
+      'Secure database architecture',
+      'User authentication system',
+      'Admin dashboard & management tools',
+      '30 days developer support',
+    ],
   },
   {
     id: 'enterprise',
     name: 'Enterprise Full-Stack Solution',
     icon: Code,
-    basePrice: 9999,
+    priceEUR: 7000,
+    priceSEK: 20200,
     features: [
       'Complete enterprise solution',
-      'Advanced security features',
-      'High scalability architecture'
-    ]
-  }
+      'Advanced security implementation',
+      'High-performance database optimization',
+      'Load balancing configuration',
+      'CI/CD pipeline setup',
+      '45 days premium support',
+    ],
+  },
 ];
 
 const ProjectSelection = () => {
-  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const navigate = useNavigate();
 
-  const handlePackageSelect = async (pkg) => {
+  const handlePackageSelect = async (pkg: Package) => {
     setSelectedPackage(pkg);
-    // Create project in backend
     try {
       const response = await fetch('/api/projects/', {
         method: 'POST',
@@ -54,10 +74,10 @@ const ProjectSelection = () => {
         body: JSON.stringify({
           package: pkg.id,
           title: `New ${pkg.name} Project`,
-          status: 'planning'
-        })
+          status: 'planning',
+        }),
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         navigate(`/dashboard/planner/${data.id}`);
@@ -69,12 +89,12 @@ const ProjectSelection = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6">
-      <h2 className="text-2xl font-semibold mb-8">Select Your Project Package</h2>
-      
+      <h2 className="text-2xl font-semibold mb-8">Select Your Professional Development Package</h2>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {packages.map((pkg) => {
           const Icon = pkg.icon;
-          
+
           return (
             <button
               key={pkg.id}
@@ -84,8 +104,10 @@ const ProjectSelection = () => {
             >
               <Icon className="h-8 w-8 mb-4 text-yellow-500" />
               <h3 className="text-lg font-medium mb-2">{pkg.name}</h3>
-              <p className="text-2xl font-bold mb-4">€{pkg.basePrice}</p>
-              
+              <p className="text-2xl font-bold mb-4">
+                €{pkg.priceEUR.toLocaleString()} / SEK{pkg.priceSEK.toLocaleString()}
+              </p>
+
               <ul className="mt-auto space-y-2">
                 {pkg.features.map((feature, index) => (
                   <li key={index} className="flex items-center text-sm text-gray-400">
