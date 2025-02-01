@@ -1,164 +1,198 @@
-import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
-import { gsap } from 'gsap';
-import { useNavigate } from 'react-router-dom';
-import Logo from '@pages/home/Logo';
+import { useEffect, useRef, FC } from 'react';
+import { 
+  CircleDollarSign, 
+  PackageSearch, 
+  Brain, 
+  CheckCircle2, 
+  MessageSquareMore,
+  ClockIcon,
+  PencilRuler,
+  AlertCircle,
+  X
+} from 'lucide-react';
 
-import ProjectFlowModal from '@/pages/home/ProjectFlowModal';
+interface Step {
+  icon: JSX.Element;
+  title: string;
+  description: string;
+  id: string;
+}
 
-const Home = () => {
-    const navigate = useNavigate();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const heroRef = useRef<HTMLElement>(null);
-    const logoRef = useRef<HTMLDivElement>(null);
-    const buttonsRef = useRef<HTMLDivElement>(null);
-    const servicesButtonRef = useRef<HTMLButtonElement>(null);
-    const contactButtonRef = useRef<HTMLButtonElement>(null);
-    const servicesShineRef = useRef<HTMLDivElement>(null);
-    const contactBorderRef = useRef<HTMLDivElement>(null);
-  
-    useEffect(() => {
-      // Only run animations on desktop/tablet
-      if (window.matchMedia('(min-width: 768px)').matches) {
-        const ctx = gsap.context(() => {
-          const heroTimeline = gsap.timeline({
-            defaults: {
-              ease: 'power3.out',
-              duration: 0.8,
-            },
-          });
-  
-          // Entry animations
-          heroTimeline
-            .from(logoRef.current, {
-              y: 30,
-              opacity: 0,
-            })
-            .from(buttonsRef.current?.children, {
-              y: 20,
-              opacity: 0,
-              stagger: 0.15,
-            }, '-=0.3');
-  
-          // Button hover animations
-          if (servicesButtonRef.current && servicesShineRef.current) {
-            const servicesTl = gsap.timeline({ paused: true });
-            servicesTl
-              .to(servicesShineRef.current, {
-                x: '200%',
-                duration: 1,
-                ease: 'power2.inOut',
-              })
-              .to(servicesButtonRef.current, {
-                scale: 1.05,
-                duration: 0.3,
-                ease: 'back.out(1.7)',
-              }, 0);
-  
-            servicesButtonRef.current.addEventListener('mouseenter', () => servicesTl.play());
-            servicesButtonRef.current.addEventListener('mouseleave', () => servicesTl.reverse());
-          }
-  
-          if (contactButtonRef.current && contactBorderRef.current) {
-            const contactTl = gsap.timeline({ paused: true });
-            contactTl
-              .to(contactBorderRef.current, {
-                rotation: 180,
-                duration: 0.8,
-                ease: 'power2.inOut',
-              })
-              .to(contactButtonRef.current, {
-                scale: 1.05,
-                duration: 0.3,
-                ease: 'back.out(1.7)',
-              }, 0);
-  
-            contactButtonRef.current.addEventListener('mouseenter', () => contactTl.play());
-            contactButtonRef.current.addEventListener('mouseleave', () => contactTl.reverse());
-          }
-        }, heroRef);
-  
-        return () => ctx.revert();
+interface ProjectFlowModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  openAuthModal: (mode: 'login' | 'register') => void;
+}
+
+const steps: Step[] = [
+  {
+    id: 'select-package',
+    icon: <PackageSearch className="w-6 h-6 text-yellow-400" aria-hidden="true" />,
+    title: "Select Project Package",
+    description: "Browse through our tailored packages to find the perfect match for your project needs."
+  },
+  {
+    id: 'initial-commitment',
+    icon: <CircleDollarSign className="w-6 h-6 text-green-400" aria-hidden="true" />,
+    title: "Initial Commitment",
+    description: "Secure your project slot with a small starting fee that confirms your commitment."
+  },
+  {
+    id: 'ai-planner',
+    icon: <Brain className="w-6 h-6 text-blue-400" aria-hidden="true" />,
+    title: "AI Project Planner",
+    description: "Our AI planner will guide you through detailed project requirements and generate a comprehensive plan."
+  },
+  {
+    id: 'review-approve',
+    icon: <CheckCircle2 className="w-6 h-6 text-purple-400" aria-hidden="true" />,
+    title: "Review & Approve",
+    description: "Review the generated plan and layout. Approve or request adjustments until it's perfect."
+  },
+  {
+    id: 'direct-communication',
+    icon: <MessageSquareMore className="w-6 h-6 text-pink-400" aria-hidden="true" />,
+    title: "Direct Communication",
+    description: "Get exclusive access to instant chat for real-time communication with your project team."
+  },
+  {
+    id: 'project-timeline',
+    icon: <ClockIcon className="w-6 h-6 text-orange-400" aria-hidden="true" />,
+    title: "Project Timeline",
+    description: "Track your project's progress with our detailed timeline and milestone tracking system."
+  }
+];
+
+const ProjectFlowModal: FC<ProjectFlowModalProps> = ({ isOpen, onClose, openAuthModal }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
       }
-    }, []);
-  
-    return (
-      <>
-        <main className="relative min-h-screen w-full bg-gray-900 text-white overflow-hidden">
-          <article
-            ref={heroRef}
-            className="relative min-h-screen flex flex-col items-center justify-center 
-                       px-4 sm:px-6 lg:px-8 py-8 md:py-0"
-          >
-            <div className="w-full max-w-6xl mx-auto">
-              <div
-                ref={logoRef}
-                className="w-full transform-gpu"
+    };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      document.addEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="project-flow-modal-title"
+    >
+      <div 
+        ref={modalRef}
+        className="relative w-full max-w-6xl mx-4 rounded-xl bg-gray-900 text-gray-100 shadow-xl"
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-4 p-2 rounded-lg hover:bg-gray-800"
+          aria-label="Close modal"
+        >
+          <X className="h-4 w-4 text-gray-400" aria-hidden="true" />
+        </button>
+
+        <div className="px-6 py-3">
+          <div className="text-center">
+            <h2 
+              id="project-flow-modal-title" 
+              className="text-lg font-semibold bg-gradient-to-r from-yellow-500 to-yellow-200 bg-clip-text text-transparent"
+            >
+              How We Build Your Project
+            </h2>
+            <p className="mt-2 text-sm text-gray-400">
+              A structured approach to bringing your vision to life
+            </p>
+          </div>
+
+          <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {steps.map((step) => (
+              <div 
+                key={step.id}
+                className="flex flex-col items-start p-4 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition"
               >
-                <Logo />
+                <div className="flex items-center justify-center p-2 bg-gray-900 rounded-full shadow-md ring-1 ring-gray-700 mb-3">
+                  {step.icon}
+                </div>
+                <h3 className="font-semibold text-base text-gray-200">
+                  {step.title}
+                </h3>
+                <p className="mt-1 text-sm text-gray-400">
+                  {step.description}
+                </p>
               </div>
-  
-              <nav
-                ref={buttonsRef}
-                className="mt-12 md:mt-16 flex flex-col sm:flex-row items-stretch sm:items-center 
-                         justify-center gap-6 sm:gap-8 max-w-lg mx-auto px-4 sm:px-0"
-                aria-label="Primary navigation"
-              >
-                <button
-                  ref={servicesButtonRef}
-                  onClick={() => navigate('/services')}
-                  className="group relative px-6 py-4 md:px-6 md:py-4
-                           bg-gradient-to-r from-yellow-400 to-yellow-600
-                           text-gray-900 text-base md:text-lg font-medium
-                           rounded-xl overflow-hidden
-                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400
-                           focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900
-                           sm:flex-1"
-                  aria-label="View our services"
-                >
-                  <div 
-                    ref={servicesShineRef}
-                    className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent 
-                              via-white/30 to-transparent -translate-x-full"
-                    aria-hidden="true"
-                  />
-                  <div className="relative flex items-center justify-center gap-3">
-                    <Sparkles className="w-5 h-5" aria-hidden="true" />
-                    <span>View Our Services</span>
-                    <ArrowRight className="w-5 h-5" aria-hidden="true" />
-                  </div>
-                </button>
-  
-                <button
-                  ref={contactButtonRef}
-                  onClick={() => setIsModalOpen(true)}
-                  className="group relative px-6 py-4 md:px-6 md:py-4
-                           text-white text-base md:text-lg font-medium
-                           rounded-xl overflow-hidden
-                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400
-                           focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900
-                           sm:flex-1"
-                  aria-label="Start your project"
-                >
-                  <div
-                    ref={contactBorderRef} 
-                    className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 
-                              rounded-xl"
-                    aria-hidden="true"
-                  />
-                  <div className="absolute inset-[2px] bg-gray-900 rounded-lg" />
-                  <span className="relative z-10">Start Your Project</span>
-                </button>
-              </nav>
+            ))}
+          </div>
+
+          <div className="mt-4 p-4 rounded-lg bg-gray-800/30 border border-gray-700">
+            <div className="flex flex-col sm:flex-row items-start gap-3">
+              <PencilRuler className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" aria-hidden="true" />
+              <div>
+                <h3 className="font-semibold text-blue-300">
+                  Ongoing Project Modifications
+                </h3>
+                <p className="mt-1 text-blue-200/80">
+                  Need changes during development? No problem! Use the instant chat to request modifications to your ongoing project. Our flexible approach ensures your project evolves with your needs.
+                </p>
+              </div>
             </div>
-          </article>
-        </main>
-        <ProjectFlowModal 
-          isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)} 
-        />
-      </>
-    );
-  };
-  
-  export default Home;
+          </div>
+
+          <div className="mt-4 p-4 rounded-lg bg-gray-800/30 border border-gray-700">
+            <div className="flex flex-col sm:flex-row items-start gap-3">
+              <AlertCircle className="w-6 h-6 text-yellow-500 flex-shrink-0 mt-1" aria-hidden="true" />
+              <div>
+                <h3 className="font-semibold text-yellow-300">
+                  Important Note
+                </h3>
+                <p className="mt-1 text-yellow-200/80">
+                  The initial planning fee helps us dedicate resources to your project and ensures commitment from both parties. This amount will be credited towards your final project cost.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={() => {
+                onClose();
+                openAuthModal('register');
+              }}
+              className="px-6 py-2.5 w-full sm:w-auto sm:min-w-[200px] bg-gradient-to-r from-yellow-500 to-yellow-600 
+                         text-gray-900 font-medium rounded-lg 
+                         hover:from-yellow-400 hover:to-yellow-500
+                         transition transform hover:scale-105
+                         focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 
+                         focus:ring-offset-gray-900"
+            >
+              Start Your Journey
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProjectFlowModal;

@@ -1,127 +1,199 @@
-import { useState } from 'react';
+// src/pages/projects/ProjectSelection.tsx
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, Code, Laptop, LucideIcon } from 'lucide-react';
+import { ArrowUpRight, Sparkles, ChevronDown, Loader2 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
-interface Package {
-  id: 'static' | 'mid_tier' | 'enterprise';
-  name: string;
-  icon: LucideIcon;
-  priceEUR: number;
-  priceSEK: number;
-  features: string[];
-}
+import { usePackages } from '@/features/projects/hooks/usePackages';
+import AddonsSelection from './AddonsSelection';
+import { PackageData } from '@/features/projects/types/project.types';
 
-const packages: Package[] = [
-  {
-    id: 'static',
-    name: 'Static Frontend Solution',
-    icon: Package,
-    priceEUR: 1500,
-    priceSEK: 6300,
-    features: [
-      'Professional developer-built React application',
-      'Custom responsive design implementation',
-      'Modern build setup with Vite',
-      'Performance optimization',
-      'Basic SEO configuration',
-      '14 days developer support',
-    ],
-  },
-  {
-    id: 'mid_tier',
-    name: 'Mid-Tier Solution',
-    icon: Laptop,
-    priceEUR: 3500,
-    priceSEK: 11200,
-    features: [
-      'Everything in Static Frontend',
-      'Custom Django REST API development',
-      'Secure database architecture',
-      'User authentication system',
-      'Admin dashboard & management tools',
-      '30 days developer support',
-    ],
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise Full-Stack Solution',
-    icon: Code,
-    priceEUR: 7000,
-    priceSEK: 20200,
-    features: [
-      'Complete enterprise solution',
-      'Advanced security implementation',
-      'High-performance database optimization',
-      'Load balancing configuration',
-      'CI/CD pipeline setup',
-      '45 days premium support',
-    ],
-  },
-];
-
-const ProjectSelection = () => {
-  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+const ProjectSelection: React.FC = () => {
   const navigate = useNavigate();
+  const { packages, selectPackage, isPending, error } = usePackages();
 
-  const handlePackageSelect = async (pkg: Package) => {
-    setSelectedPackage(pkg);
+  const [selectedPackage, setSelectedPackage] = useState<PackageData | null>(null);
+  const [isOpen, setIsOpen] = useState<Record<string, boolean>>({});
+  const [showAddons, setShowAddons] = useState(false);
+
+  // Toggle the features list for a single package
+  const toggleFeatures = (pkgId: string) => {
+    setIsOpen((prev) => ({ ...prev, [pkgId]: !prev[pkgId] }));
+  };
+
+  // Handle picking a package: call backend, then show Addons
+  const handlePackageSelect = async (pkg: PackageData) => {
     try {
-      const response = await fetch('/api/projects/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          package: pkg.id,
-          title: `New ${pkg.name} Project`,
-          status: 'planning',
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        navigate(`/dashboard/planner/${data.id}`);
-      }
-    } catch (error) {
-      console.error('Failed to create project:', error);
+      await selectPackage(pkg.id);
+      setSelectedPackage(pkg);
+      setShowAddons(true);
+    } catch (err) {
+      toast.error('Failed to select package. Please try again.');
     }
   };
 
+  // If a package is chosen, show the Addons step
+  if (showAddons && selectedPackage) {
+    return (
+      <AddonsSelection
+        selectedPackage={selectedPackage}
+        onBack={() => setShowAddons(false)}
+      />
+    );
+  }
+
+  // Otherwise, show the package list
   return (
-    <div className="w-full max-w-6xl mx-auto p-6">
-      <h2 className="text-2xl font-semibold mb-8">Select Your Professional Development Package</h2>
+    <main className="w-full max-w-6xl mx-auto p-6">
+      <h2 className="text-3xl font-light mb-10 text-white">
+        Select Your Professional Development Package
+      </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {packages.map((pkg) => {
-          const Icon = pkg.icon;
-
-          return (
-            <button
+      {/* Error or Loading states */}
+      {error ? (
+        <div className="bg-red-500/10 border border-red-500 p-4 rounded-lg">
+          Failed to load packages. Please refresh and try again.
+        </div>
+      ) : isPending ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-[600px] bg-gray-800/20 animate-pulse rounded-xl" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {packages.map((pkg) => (
+            <div
               key={pkg.id}
-              onClick={() => handlePackageSelect(pkg)}
-              className="flex flex-col p-6 rounded-xl bg-gray-800/50 border border-gray-700/50
-                         hover:border-yellow-500/50 hover:bg-gray-800/80 transition-all duration-300"
+              className="relative p-6 rounded-xl bg-gray-800/50 hover:bg-gray-800 transition-all duration-300"
             >
-              <Icon className="h-8 w-8 mb-4 text-yellow-500" />
-              <h3 className="text-lg font-medium mb-2">{pkg.name}</h3>
-              <p className="text-2xl font-bold mb-4">
-                €{pkg.priceEUR.toLocaleString()} / SEK{pkg.priceSEK.toLocaleString()}
-              </p>
+              {/* Recommended Badge */}
+              {pkg.recommended && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <span className="bg-yellow-500 text-gray-900 px-3 py-px rounded-full text-xs font-medium flex items-center gap-1.5">
+                    <Sparkles className="w-3 h-3" />
+                    Most Popular
+                  </span>
+                </div>
+              )}
 
-              <ul className="mt-auto space-y-2">
-                {pkg.features.map((feature, index) => (
-                  <li key={index} className="flex items-center text-sm text-gray-400">
-                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-2" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </button>
-          );
-        })}
-      </div>
-    </div>
+              <div className="space-y-6">
+                {/* Package Title & Price */}
+                <div>
+                  <h3 className="text-xl font-light text-white">{pkg.title}</h3>
+                  <PriceDisplay priceEUR={pkg.priceEUR} priceSEK={pkg.priceSEK} />
+                </div>
+
+                {/* Core & Extra Features */}
+                <Features
+                  features={pkg.features}
+                  extraFeatures={pkg.extraFeatures}
+                  isOpen={isOpen[pkg.id]}
+                  onToggle={() => toggleFeatures(pkg.id)}
+                />
+
+                {/* "Select Package" Button */}
+                <button
+                  onClick={() => handlePackageSelect(pkg)}
+                  disabled={isPending}
+                  className="group w-full py-3 px-4 rounded-lg text-sm font-medium
+                    transition-all duration-300 flex items-center justify-center gap-2
+                    bg-yellow-500 text-gray-900 hover:bg-yellow-400 mt-4
+                    disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isPending ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      Select Package
+                      <ArrowUpRight
+                        className="w-4 h-4 transition-transform
+                          group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      />
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </main>
   );
 };
+
+//
+// PriceDisplay Component
+//
+const PriceDisplay = ({
+  priceEUR,
+  priceSEK
+}: {
+  priceEUR: string;
+  priceSEK: string;
+}) => (
+  <div className="mt-2">
+    <div className="flex items-baseline">
+      <span className="text-3xl font-light text-white">{priceEUR}</span>
+      <span className="ml-2 text-sm text-gray-400">EUR</span>
+    </div>
+    <div className="flex items-baseline mt-1">
+      <span className="text-lg font-light text-gray-400">{priceSEK}</span>
+      <span className="ml-2 text-xs text-gray-500">SEK</span>
+    </div>
+  </div>
+);
+
+//
+// Features Component
+//
+const Features = ({
+  features,
+  extraFeatures,
+  isOpen,
+  onToggle
+}: {
+  features: string[];
+  extraFeatures: string[];
+  isOpen: boolean;
+  onToggle: () => void;
+}) => (
+  <>
+    <ul className="space-y-3 text-sm border-t border-gray-700/30 pt-6" role="list">
+      {features.map((feature, index) => (
+        <li key={index} className="flex items-start space-x-3">
+          <span className="text-yellow-500 text-lg leading-none">•</span>
+          <span className="text-gray-300">{feature}</span>
+        </li>
+      ))}
+    </ul>
+
+    <div className="pt-2">
+      <button
+        onClick={onToggle}
+        className="w-full text-left text-sm text-yellow-500 hover:underline
+          focus:outline-none flex items-center gap-2"
+      >
+        {isOpen ? 'Hide additional features' : 'View additional features'}
+        <ChevronDown
+          className={`w-4 h-4 transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="mt-3 space-y-3 text-sm">
+          {extraFeatures.map((feature, index) => (
+            <div key={index} className="flex items-start space-x-3">
+              <span className="text-yellow-500 text-lg leading-none">•</span>
+              <span className="text-gray-300">{feature}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </>
+);
 
 export default ProjectSelection;

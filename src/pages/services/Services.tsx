@@ -1,9 +1,25 @@
 import { useEffect, useRef } from 'react';
-import { ArrowUpRight, ChevronRight, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Sparkles } from 'lucide-react';
 import { gsap } from 'gsap';
 import { useNavigate } from 'react-router-dom';
 
-const ServiceTier = ({ title, priceEUR, priceSEK, features, recommended = false, onSelect }) => (
+interface ServiceTierProps {
+  title: string;
+  priceEUR: string;
+  priceSEK: string;
+  features: string[];
+  recommended?: boolean;
+  onSelect: () => void;
+}
+
+const ServiceTier = ({
+  title,
+  priceEUR,
+  priceSEK,
+  features,
+  recommended = false,
+  onSelect,
+}: ServiceTierProps) => (
   <div 
     className="relative p-6 rounded-xl bg-gray-800/50 hover:bg-gray-800 
     transition-all duration-300"
@@ -55,7 +71,7 @@ const ServiceTier = ({ title, priceEUR, priceSEK, features, recommended = false,
 
 const Services = () => {
   const navigate = useNavigate();
-  const servicesRef = useRef(null);
+  const servicesRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -63,7 +79,7 @@ const Services = () => {
         y: 30,
         opacity: 0,
         duration: 0.8,
-        ease: 'power3.out'
+        ease: 'power3.out',
       });
     });
 
@@ -80,7 +96,9 @@ const Services = () => {
             <span className="block">Services</span>
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl">
-            From concept to deployment, we deliver scalable and maintainable solutions.
+            From concept to deployment, we deliver scalable and maintainable 
+            solutions using a modern TypeScript front end, Django back end, 
+            and cloud-based CDN for top performance. All animations powered by GSAP.
           </p>
         </div>
 
@@ -92,9 +110,9 @@ const Services = () => {
               priceEUR="600"
               priceSEK="6,300"
               features={[
-                'React with Vite',
-                'Modern responsive design',
-                'Basic SEO optimization',
+                'Modern TypeScript-based front end',
+                'Responsive & mobile-friendly design',
+                'Basic on-page SEO optimization',
               ]}
               onSelect={() => navigate('/contact', { state: { selectedTier: 'static' }})}
             />
@@ -102,11 +120,11 @@ const Services = () => {
               title="Full Stack"
               priceEUR="1,100"
               priceSEK="11,200"
-              recommended={true}
+              recommended
               features={[
                 'Everything in Static Frontend',
-                'Backend API with Django',
-                'Database integration',
+                'Django-based back end',
+                'Database integration & API endpoints',
               ]}
               onSelect={() => navigate('/contact', { state: { selectedTier: 'fullstack' }})}
             />
@@ -116,27 +134,53 @@ const Services = () => {
               priceSEK="20,200"
               features={[
                 'Everything in Full Stack',
-                'Advanced security features',
-                'Cloud infrastructure setup',
+                'Advanced security & authentication',
+                'Cloud infrastructure & deployment',
               ]}
               onSelect={() => navigate('/contact', { state: { selectedTier: 'enterprise' }})}
             />
           </div>
         </section>
 
+        {/* Recommended Setup for Full Stack */}
+        <section className="mb-24">
+          <h2 className="text-2xl font-light text-yellow-500 mb-4">Recommended Setup</h2>
+          <div className="bg-gray-800/50 rounded-xl p-6">
+            <p className="text-gray-300 mb-4 leading-relaxed">
+              Our Full Stack package includes Django’s 
+              <strong className="text-gray-100"> standard session-based authentication</strong>, 
+              covering basic logins, password resets, and the user flows most businesses expect.
+            </p>
+            <p className="text-gray-300 mb-4 leading-relaxed">
+              For more advanced security or custom auth features, we offer the following add-ons:
+            </p>
+            <ul className="list-disc list-inside text-gray-400 space-y-2 ml-4">
+              <li>Social/OAuth Logins (Google, Facebook, etc.)</li>
+              <li>JWT-Based Authentication (ideal for SPAs or mobile apps)</li>
+              <li>Role-Based Access Control (RBAC) for multiple user groups</li>
+              <li>Multi-Factor Authentication (2FA) for higher security</li>
+            </ul>
+            <p className="text-gray-300 mt-4 leading-relaxed">
+              This keeps our Full Stack package approachable and cost-effective, 
+              while still allowing for powerful extensions as your business grows.
+            </p>
+          </div>
+        </section>
+
         {/* Detailed Features */}
         <section ref={servicesRef} className="space-y-12">
-          <h2 className="text-2xl font-light text-white">Enterprise Features</h2>
+          <h2 className="text-2xl font-light text-white">Enterprise-Level Features</h2>
           <div className="grid md:grid-cols-3 gap-8">
+            {/* Frontend Features */}
             <div className="space-y-6 p-6 rounded-xl bg-gray-800/50">
               <h3 className="text-xl font-light text-yellow-500">Frontend</h3>
               <ul className="space-y-3 text-sm">
                 {[
-                  "Vite + React with TypeScript",
-                  "Redux or Context API",
-                  "Tailwind CSS",
-                  "Comprehensive testing",
-                  "SEO optimization"
+                  "TypeScript-based SPA",
+                  "Tailwind CSS for rapid UI",
+                  "Full GSAP animation support",
+                  "SEO best practices",
+                  "Responsive testing across devices"
                 ].map((feature, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <span className="text-yellow-500 text-lg leading-none">•</span>
@@ -145,15 +189,17 @@ const Services = () => {
                 ))}
               </ul>
             </div>
+
+            {/* Backend Features */}
             <div className="space-y-6 p-6 rounded-xl bg-gray-800/50">
               <h3 className="text-xl font-light text-yellow-500">Backend</h3>
               <ul className="space-y-3 text-sm">
                 {[
-                  "Django REST Framework",
-                  "JWT & OAuth integration",
-                  "PostgreSQL with ORM",
-                  "Redis caching",
-                  "API documentation"
+                  "Django & Django REST Framework",
+                  "JWT / OAuth authentication",
+                  "PostgreSQL & ORM integration",
+                  "Redis caching for performance",
+                  "Extensive API documentation"
                 ].map((feature, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <span className="text-yellow-500 text-lg leading-none">•</span>
@@ -162,15 +208,17 @@ const Services = () => {
                 ))}
               </ul>
             </div>
+
+            {/* DevOps Features */}
             <div className="space-y-6 p-6 rounded-xl bg-gray-800/50">
               <h3 className="text-xl font-light text-yellow-500">DevOps</h3>
               <ul className="space-y-3 text-sm">
                 {[
-                  "Cloud deployment",
-                  "Infrastructure as Code",
-                  "CI/CD pipeline",
-                  "Advanced monitoring",
-                  "Security protocols"
+                  "Cloud deployment & CDN",
+                  "Infrastructure as Code (IaC)",
+                  "CI/CD pipelines",
+                  "Advanced monitoring & logging",
+                  "Security protocols & audits"
                 ].map((feature, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <span className="text-yellow-500 text-lg leading-none">•</span>

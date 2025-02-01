@@ -214,7 +214,8 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
               Crafting Digital Excellence
             </h1>
             <p className="text-lg text-gray-300/90 leading-relaxed">
-              We transform complex ideas into elegant solutions while maintaining robust security standards.
+              We transform complex ideas into elegant solutions while 
+              maintaining robust security standards.
             </p>
           </div>
           
@@ -224,7 +225,8 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
               Security-First Development
             </h2>
             <p className="text-base text-gray-300/90 leading-relaxed">
-              In an era where AI powers development, we prioritize human oversight and security-first practices.
+              In an era where AI powers development, we prioritize 
+              human oversight and security-first practices.
             </p>
             
             {/* Masked Image - Moved inside left column */}
@@ -251,7 +253,7 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
                 </defs>
 
                 <image
-                  href="https://res.cloudinary.com/drl5k67we/image/upload/v1738077117/pexels-negativespace-97077_nfh1f4.webp"
+                  href="https://res.cloudinary.com/drl5k67we/image/upload/v1738282011/erasebg-transformed_1_rx6xqs.webp"
                   width="200"
                   height="200"
                   mask="url(#imageMask)"
@@ -265,6 +267,17 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
           {/* Right Column */}
           <div className="space-y-6">
             <ul className="space-y-4 text-base text-gray-300/90">
+              {/* NEW: Emphasize your TypeScript+Django + CDN+GSAP */}
+              <li className="flex items-start gap-3">
+                <span className="text-yellow-400 mt-1">→</span>
+                <span>Modern <strong>TypeScript front end</strong> + secure <strong>Django back end</strong></span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-yellow-400 mt-1">→</span>
+                <span>Optimized with a global <strong>CDN</strong> and snappy <strong>GSAP animations</strong></span>
+              </li>
+
+              {/* Existing bullet points */}
               <li className="flex items-start gap-3">
                 <span className="text-yellow-400 mt-1">→</span>
                 <span>Manual code review and security audits ensure robust solutions</span>
@@ -293,7 +306,8 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
             Crafting Digital Excellence
           </h2>
           <p className="text-base text-gray-300/90 leading-relaxed">
-            We transform complex ideas into secure, elegant solutions that drive business growth.
+            We transform complex ideas into secure, elegant solutions 
+            that drive business growth.
           </p>
           <div className="py-2"> 
             <h3 className="text-lg font-medium text-yellow-300 mb-3">Our Security Promise:</h3>
