@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { billingApi } from '@/features/billing/api/api.billing';
+import { billingApi } from '@/features/billing/api/billing';
 
 export function usePaymentPlan(projectId: string) {
   const paymentPlan = useQuery({

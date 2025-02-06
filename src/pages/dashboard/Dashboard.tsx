@@ -73,9 +73,9 @@ function Dashboard() {
         </div>
         <div className="px-4 py-6">
           <div className="space-y-3">
-          <NavButton icon={FolderCog} path="/dashboard/project-selection">
-  Start Project
-</NavButton>
+            <NavButton icon={FolderCog} path="/dashboard/project-selection">
+              Start Project
+            </NavButton>
             <NavButton icon={LayoutGrid} path="/dashboard">Overview</NavButton>
             <NavButton icon={MessageSquare} path="/dashboard/messages">Messages</NavButton>
             <NavButton icon={FileText} path="/dashboard/documents">Documents</NavButton>
@@ -84,7 +84,12 @@ function Dashboard() {
           <div className="space-y-1">
             <NavButton icon={CreditCard} path="/dashboard/billing">Billing</NavButton>
             <NavButton icon={SettingsIcon} path="/dashboard/settings">Settings</NavButton>
+            {user && (user.is_staff || user.is_superuser) && (
+            <NavButton icon={FolderCog} path="/dashboard/developer-worksheet">Dev WorkSheet</NavButton>
+          )
+        }
           </div>
+          
         </div>
         <div className="mt-auto px-4 py-6">
           <div className="p-4 rounded-xl bg-gray-700/50 backdrop-blur-sm">

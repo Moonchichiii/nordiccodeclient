@@ -1,334 +1,382 @@
-import { useState, useEffect, useRef, forwardRef } from 'react';
-import { Sun, Moon, Menu, LogIn, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Sun, Moon, Menu, LogIn, X, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import AuthModal from '@/features/auth/components/AuthModal';
 import { gsap } from 'gsap';
 import { NavLink as RouterLink, useLocation } from 'react-router-dom';
 
 interface NavLinkProps {
-    href: string;
-    children: React.ReactNode;
-    onClick?: () => void;
-    className?: string;
+  href: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
 }
 
 interface HeaderProps {
-    timeTheme: 'day' | 'dawn' | 'night';
-    setTimeTheme: React.Dispatch<React.SetStateAction<'day' | 'dawn' | 'night'>>;
-    isScrollingUp: boolean;
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
+  isScrollingUp: boolean;
+  isHomeVisible: boolean;
+  showHamburger: boolean;
 }
 
 const NavLink: React.FC<NavLinkProps> = ({ href, children, onClick, className }) => (
-    <RouterLink
-        to={href}
-        onClick={onClick}
-        className={`group relative px-4 py-2 text-sm font-medium text-gray-300 hover:text-white 
-        transition-all duration-300 rounded-lg focus:outline-none focus-visible:ring-2 
-        focus-visible:ring-yellow-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${className}`}
-    >
-        <span className="relative z-10">{children}</span>
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/0 via-yellow-500/10 to-yellow-500/0 
-        rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-yellow-500 
-        rounded-full opacity-0 group-hover:opacity-100 group-hover:w-full 
-        transition-all duration-300 ease-out" />
-    </RouterLink>
+  <RouterLink
+    to={href}
+    onClick={onClick}
+    className={`group relative px-6 py-2 text-lg font-light text-foreground-alt hover:text-foreground 
+      transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${className}`}
+  >
+    <span className="relative">
+      {children}
+      <span
+        className="absolute bottom-0 left-0 w-0 h-px bg-gradient-to-r from-primary to-primary-light
+          transition-all duration-300 group-hover:w-full"
+        aria-hidden="true"
+      />
+    </span>
+  </RouterLink>
 );
 
-const AuthButton = forwardRef<
-    HTMLButtonElement,
-    React.ButtonHTMLAttributes<HTMLButtonElement> & {
-        variant?: 'ghost' | 'solid';
-    }
->(({ onClick, variant = 'ghost', children, ...props }, ref) => (
-    <button
-        ref={ref}
-        onClick={onClick}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50
-            ${variant === 'ghost' 
-                ? 'text-gray-300 hover:text-white hover:bg-white/10 active:bg-white/5' 
-                : 'bg-gradient-to-r from-yellow-500 to-yellow-400 text-gray-900 hover:brightness-110 active:brightness-90 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center gap-2'
-            }`}
-        {...props}
-    >
-        {children}
-    </button>
-));
+const Header = ({ theme, toggleTheme, isScrollingUp, isHomeVisible, showHamburger }: HeaderProps) => {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const hamburgerFillRef = useRef<HTMLDivElement>(null);
+  const { user, logout } = useAuth();
+  const location = useLocation();
 
-AuthButton.displayName = 'AuthButton';
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location]);
 
-const Header: React.FC<HeaderProps> = ({ timeTheme, setTimeTheme, isScrollingUp }) => {
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-    const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const headerRef = useRef<HTMLElement>(null);
-    const mobileMenuRef = useRef<HTMLDivElement>(null);
-    const { user, logout } = useAuth();
-    const location = useLocation();
+  useEffect(() => {
+    if (!hamburgerRef.current || !hamburgerFillRef.current) return;
 
-    useEffect(() => {
-        setIsMobileMenuOpen(false);
-    }, [location]);
+    const hamburgerTimeline = gsap.timeline({ paused: true });
+    hamburgerTimeline
+      .to(hamburgerFillRef.current, {
+        height: '100%',
+        duration: 0.4,
+        ease: 'power2.out',
+      })
+      .to(hamburgerRef.current.querySelector('.hamburger-icon'), {
+        scale: 1.1,
+        rotate: '10deg',
+        duration: 0.3,
+        ease: 'back.out(2)',
+      }, 0);
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                isMobileMenuOpen &&
-                mobileMenuRef.current &&
-                !mobileMenuRef.current.contains(event.target as Node) &&
-                !headerRef.current?.contains(event.target as Node)
-            ) {
-                setIsMobileMenuOpen(false);
-            }
-        };
+    const enterHandler = () => hamburgerTimeline.play();
+    const leaveHandler = () => hamburgerTimeline.reverse();
 
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [isMobileMenuOpen]);
+    hamburgerRef.current.addEventListener('mouseenter', enterHandler);
+    hamburgerRef.current.addEventListener('mouseleave', leaveHandler);
 
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            gsap.fromTo(
-                headerRef.current,
-                { 
-                    yPercent: -100,
-                    opacity: 0
-                },
-                {
-                    yPercent: 0,
-                    opacity: 1,
-                    duration: 0.8,
-                    ease: 'expo.out',
-                }
-            );
-        }, headerRef);
-
-        return () => ctx.revert();
-    }, []);
-
-    const toggleTheme = () => {
-        setTimeTheme((prevTheme) =>
-            prevTheme === 'day' || prevTheme === 'dawn' ? 'night' : 'day'
-        );
+    return () => {
+      if (hamburgerRef.current) {
+        hamburgerRef.current.removeEventListener('mouseenter', enterHandler);
+        hamburgerRef.current.removeEventListener('mouseleave', leaveHandler);
+      }
     };
+  }, []);
 
-    const openAuthModal = (mode: 'login' | 'register') => {
-        setAuthMode(mode);
-        setIsAuthModalOpen(true);
-    };
+  useEffect(() => {
+    if (!menuRef.current || !isMobileMenuOpen) return;
 
-    return (
-        <>
-            <header
-                ref={headerRef}
-                className={`fixed top-0 left-0 right-0 transition-all duration-500 z-50
-                    ${isScrollingUp ? 'translate-y-0' : '-translate-y-full'}
-                    backdrop-blur-md bg-gray-900/80 border-b border-gray-800/50`}
-            >
-                <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        {!user && (
-                            <RouterLink
-                                to="/"
-                                className="relative group focus:outline-none 
-                                focus-visible:ring-2 focus-visible:ring-yellow-500/50 rounded-lg"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 
-                                bg-clip-text text-transparent transition-all duration-300
-                                group-hover:from-yellow-400 group-hover:to-yellow-500">
-                                    Nordic Code Works
-                                </span>
-                            </RouterLink>
-                        )}
+    const ctx = gsap.context(() => {
+      // Slide in animation for the sidebar
+      gsap.fromTo(menuRef.current,
+        {
+          x: '100%',
+          opacity: 0,
+        },
+        {
+          x: '0%',
+          opacity: 1,
+          duration: 0.5,
+          ease: 'power3.out',
+        }
+      );
 
-                        <div className="flex md:hidden">
-                            <button
-                                className="p-2 rounded-lg border border-gray-700/50 
-                                hover:border-yellow-500/30 transition-all duration-300
-                                focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50
-                                active:bg-gray-800"
-                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            >
-                                {isMobileMenuOpen ? (
-                                    <X className="w-5 h-5 text-gray-400" />
-                                ) : (
-                                    <Menu className="w-5 h-5 text-gray-400" />
-                                )}
-                            </button>
-                        </div>
+      // Stagger animation for menu items
+      gsap.fromTo('.menu-item',
+        {
+          x: 50,
+          opacity: 0,
+        },
+        {
+          x: 0,
+          opacity: 1,
+          stagger: 0.1,
+          duration: 0.4,
+          ease: 'power2.out',
+        }
+      );
+    });
 
-                        <div className="hidden md:flex items-center justify-between flex-1 pl-8">
-                            <nav className="flex items-center gap-4">
-                                {user && (
-                                    <NavLink href="/dashboard">Dashboard</NavLink>
-                                )}
-                                <NavLink href="/services">Services</NavLink>
-                                <NavLink href="/portfolio">Portfolio</NavLink>
-                                <NavLink href="/contact">Contact</NavLink>
-                            </nav>
+    return () => ctx.revert();
+  }, [isMobileMenuOpen]);
 
-                            <div className="flex items-center gap-4">
-                                <button
-                                    onClick={toggleTheme}
-                                    className="p-2 rounded-lg border border-gray-700/50 
-                                    hover:border-yellow-500/30 transition-all duration-300 
-                                    focus:outline-none focus-visible:ring-2 
-                                    focus-visible:ring-yellow-500/50 active:bg-gray-800"
-                                >
-                                    {timeTheme === 'night' ? (
-                                        <Sun className="w-4 h-4 text-gray-400" />
-                                    ) : (
-                                        <Moon className="w-4 h-4 text-gray-400" />
-                                    )}
-                                </button>
+  const openAuthModal = (mode: 'login' | 'register') => {
+    setAuthMode(mode);
+    setIsAuthModalOpen(true);
+  };
 
-                                {user ? (
-                                    <AuthButton onClick={() => logout.mutate()}>
-                                        Sign Out
-                                    </AuthButton>
-                                ) : (
-                                    <div className="flex items-center gap-3">
-                                        <AuthButton onClick={() => openAuthModal('login')}>
-                                            Sign In
-                                        </AuthButton>
-                                        <AuthButton
-                                            onClick={() => openAuthModal('register')}
-                                            variant="solid"
-                                        >
-                                            <LogIn className="w-4 h-4" />
-                                            Sign Up
-                                        </AuthButton>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+  return (
+    <>
+      <header
+        ref={headerRef}
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500
+          ${isScrollingUp ? 'translate-y-0' : '-translate-y-full'}
+          ${isHomeVisible ? 'bg-transparent' : 'bg-background/80 backdrop-blur-md'}
+          ${showHamburger ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}
+      >
+        <div className="mx-auto max-w-[1920px] px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20">
+            {/* Logo */}
+            <RouterLink to="/" className="flex items-center gap-3 group">
+              <svg
+                width="48"
+                height="48"
+                viewBox="0 0 200 200"
+                xmlns="http://www.w3.org/2000/svg"
+                className="transition-transform duration-300 group-hover:scale-110"
+              >
+                <path
+                  d="
+                    M 50,150
+                    C 40,110  60,70   50,50
+                    L 150,150              
+                    C 140,110  160,70   150,50
+                  "
+                  fill="none"
+                  stroke="currentColor"
+                  className="text-background"
+                  strokeWidth="32"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="
+                    M 50,150
+                    C 40,110  60,70   50,50
+                    L 150,150
+                    C 140,110  160,70  150,50
+                  "
+                  fill="none"
+                  stroke="currentColor"
+                  className="text-primary"
+                  strokeWidth="28"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </RouterLink>
 
-                    {/* Mobile Menu */}
-                    <div
-                        ref={mobileMenuRef}
-                        className={`md:hidden absolute top-full left-0 right-0 
-                        border-t border-gray-800/50 bg-gray-900/95 backdrop-blur-md
-                        transition-all duration-300 transform ${
-                            isMobileMenuOpen
-                                ? 'translate-y-0 opacity-100'
-                                : '-translate-y-4 opacity-0 pointer-events-none'
-                        }`}
+            
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-8">
+              <NavLink href="/services">Services</NavLink>
+              <NavLink href="/portfolio">Portfolio</NavLink>
+              <NavLink href="/contact">Contact</NavLink>
+            </nav>
+
+            {/* Desktop Auth & Theme */}
+            <div className="hidden lg:flex items-center gap-6">
+              <button
+                onClick={toggleTheme}
+                className="p-2.5 rounded-full bg-foreground/5 hover:bg-foreground/10 
+                  transition-colors duration-300 focus:outline-none focus-visible:ring-2 
+                  focus-visible:ring-primary/50"
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-5 h-5 text-primary" />
+                ) : (
+                  <Moon className="w-5 h-5 text-primary" />
+                )}
+              </button>
+
+              {user ? (
+                <button
+                  onClick={() => logout.mutate()}
+                  className="px-6 py-2 rounded-full text-foreground-alt hover:text-foreground 
+                    hover:bg-primary/10 transition-colors font-medium"
+                >
+                  Sign Out
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => openAuthModal('login')}
+                    className="px-6 py-2 rounded-full text-foreground-alt hover:text-foreground 
+                      hover:bg-primary/10 transition-colors font-medium"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => openAuthModal('register')}
+                    className="px-6 py-2 rounded-full bg-primary text-white hover:bg-primary-light 
+                      transition-colors font-medium flex items-center gap-2"
+                  >
+                    <LogIn className="w-5 h-5" />
+                    Sign Up
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hamburger Menu Button */}
+      <button
+        ref={hamburgerRef}
+        onClick={() => setIsMobileMenuOpen(true)}
+        className={`fixed right-8 top-8 z-50 w-20 h-20 rounded-full bg-background/80 
+          backdrop-blur-md border border-primary/10 shadow-lg transition-all duration-300
+          hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50
+          overflow-hidden transform hover:scale-105
+          ${showHamburger ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}
+        aria-label="Open menu"
+      >
+        <div
+          ref={hamburgerFillRef}
+          className="absolute inset-0 bg-gradient-to-t from-primary/20 to-primary/5"
+          style={{ height: '0%' }}
+          aria-hidden="true"
+        />
+        <div className="relative z-10 h-full flex flex-col items-center justify-center gap-2 hamburger-icon">
+          <Menu className="w-8 h-8 text-primary" aria-hidden="true" />
+        </div>
+      </button>
+
+      {/* Sidebar Menu */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-[60] bg-background/80 backdrop-blur-md">
+          <div
+            ref={menuRef}
+            className="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-background shadow-2xl 
+              border-l border-primary/10 overflow-y-auto dark:bg-background-alt"
+          >
+            <div className="h-full flex flex-col">
+              {/* Menu Header */}
+              <div className="flex items-center justify-between p-6 border-b border-primary/10">
+                <h2 className="text-2xl font-light">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">
+                    Menu
+                  </span>
+                </h2>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 rounded-full hover:bg-primary/10 transition-colors"
+                  aria-label="Close menu"
+                >
+                  <X className="w-6 h-6 text-primary" />
+                </button>
+              </div>
+
+              {/* Menu Content */}
+              <div className="flex-1 p-6">
+                <nav className="space-y-6">
+                  {/* Theme Toggle */}
+                  <div className="menu-item p-4 rounded-full bg-primary/5 flex items-center justify-between">
+                    <span className="text-lg font-light text-foreground">Theme</span>
+                    <button
+                      onClick={toggleTheme}
+                      className="p-3 rounded-full bg-background hover:bg-primary/10 
+                        transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
                     >
-                        <div className="p-4 space-y-6">
-                            <nav className="flex flex-col gap-3">
-                                {user && (
-                                    <NavLink 
-                                        href="/dashboard" 
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="px-4 py-3 text-base font-medium text-gray-300 hover:text-white 
-                                                 transition-all duration-300 rounded-lg focus:outline-none focus-visible:ring-2 
-                                                 focus-visible:ring-yellow-500/50"
-                                    >
-                                        Dashboard
-                                    </NavLink>
-                                )}
-                                <NavLink 
-                                    href="/services" 
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="px-4 py-3 text-base font-medium text-gray-300 hover:text-white 
-                                             transition-all duration-300 rounded-lg focus:outline-none focus-visible:ring-2 
-                                             focus-visible:ring-yellow-500/50"
-                                >
-                                    Services
-                                </NavLink>
-                                <NavLink 
-                                    href="/portfolio" 
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="px-4 py-3 text-base font-medium text-gray-300 hover:text-white 
-                                             transition-all duration-300 rounded-lg focus:outline-none focus-visible:ring-2 
-                                             focus-visible:ring-yellow-500/50"
-                                >
-                                    Portfolio
-                                </NavLink>
-                                <NavLink 
-                                    href="/contact" 
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="px-4 py-3 text-base font-medium text-gray-300 hover:text-white 
-                                             transition-all duration-300 rounded-lg focus:outline-none focus-visible:ring-2 
-                                             focus-visible:ring-yellow-500/50"
-                                >
-                                    Contact
-                                </NavLink>
-                            </nav>
+                      {theme === 'dark' ? (
+                        <Sun className="w-5 h-5 text-primary" />
+                      ) : (
+                        <Moon className="w-5 h-5 text-primary" />
+                      )}
+                    </button>
+                  </div>
 
-                            <div className="pt-4 border-t border-gray-800/50 space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <button
-                                        onClick={toggleTheme}
-                                        className="p-3 rounded-lg bg-gray-800 border border-gray-700 
-                                        hover:border-yellow-500/50 hover:bg-gray-700 transition-all duration-300
-                                        focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50"
-                                    >
-                                        {timeTheme === 'night' ? (
-                                            <Sun className="w-5 h-5 text-yellow-400" />
-                                        ) : (
-                                            <Moon className="w-5 h-5 text-yellow-400" />
-                                        )}
-                                    </button>
-                                </div>
-                        
-                                {user ? (
-                                    <AuthButton
-                                        onClick={() => {
-                                            logout.mutate();
-                                            setIsMobileMenuOpen(false);
-                                        }}
-                                        className="w-full text-sm font-medium py-2.5 rounded-xl"
-                                    >
-                                        Sign Out
-                                    </AuthButton>
-                                ) : (
-                                    <div className="flex flex-col gap-2.5">
-                                      <AuthButton
-    onClick={() => {
-        openAuthModal('login');
-        setIsMobileMenuOpen(false);
-    }}
-    className="w-full bg-gray-800 text-gray-100 text-sm font-medium py-2.5 rounded-xl 
-             border border-gray-600 hover:border-gray-500
-             hover:bg-gray-700 flex items-center justify-center
-             shadow-sm shadow-black/20"
->
-    Sign In
-</AuthButton>
-                                        <AuthButton
-                                            onClick={() => {
-                                                openAuthModal('register');
-                                                setIsMobileMenuOpen(false);
-                                            }}
-                                            variant="solid"
-                                            className="w-full text-sm font-medium py-2.5 rounded-xl 
-                                                     bg-gradient-to-r from-yellow-500 to-yellow-400 
-                                                     hover:from-yellow-400 hover:to-yellow-300
-                                                     flex items-center justify-center gap-2"
-                                        >
-                                            <LogIn className="w-4 h-4 stroke-[2.5]" />
-                                            <span>Sign Up</span>
-                                        </AuthButton>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                  {/* Navigation Links */}
+                  <div className="space-y-2">
+                    {[
+                      { href: '/services', label: 'Services' },
+                      { href: '/portfolio', label: 'Portfolio' },
+                      { href: '/contact', label: 'Contact' }
+                    ].map((item) => (
+                      <RouterLink
+                        key={item.href}
+                        to={item.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="menu-item group flex items-center w-full p-4 rounded-full text-lg 
+                          font-light text-foreground-alt hover:text-foreground hover:bg-primary/5 
+                          transition-all duration-300"
+                      >
+                        <span>{item.label}</span>
+                        <ChevronRight className="w-5 h-5 ml-auto opacity-0 -translate-x-2 
+                          group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                      </RouterLink>
+                    ))}
+                  </div>
+
+                  {/* Auth Section */}
+                  <div className="menu-item pt-6 mt-6 border-t border-primary/10">
+                    {user ? (
+                      <button
+                        onClick={() => {
+                          logout.mutate();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full p-4 rounded-full bg-primary text-white hover:bg-primary-light 
+                          transition-colors font-medium"
+                      >
+                        Sign Out
+                      </button>
+                    ) : (
+                      <div className="space-y-3">
+                        <button
+                          onClick={() => {
+                            openAuthModal('login');
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="w-full p-4 rounded-full bg-primary/10 text-foreground 
+                            hover:bg-primary/20 transition-colors font-medium"
+                        >
+                          Sign In
+                        </button>
+                        <button
+                          onClick={() => {
+                            openAuthModal('register');
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="w-full p-4 rounded-full bg-primary text-white 
+                            hover:bg-primary-light transition-colors font-medium flex items-center justify-center gap-2"
+                        >
+                          <LogIn className="w-5 h-5" />
+                          Sign Up
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </nav>
-            </header>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
-            <AuthModal
-                isOpen={isAuthModalOpen}
-                initialMode={authMode}
-                onClose={() => setIsAuthModalOpen(false)}
-                onSuccess={() => setIsAuthModalOpen(false)}
-            />
-        </>
-    );
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        initialMode={authMode}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => setIsAuthModalOpen(false)}
+      />
+    </>
+  );
 };
 
 export default Header;

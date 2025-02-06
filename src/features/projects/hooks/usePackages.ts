@@ -1,20 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { packages } from '../constants/packages';
-import { projectsApi } from '../api/projects';
+import { useMutation } from '@tanstack/react-query'
+import { packages } from '../constants/packages'
+import { projectsApi } from '../api/projects'
+import { PackageType } from '../types/types'
 
 export const usePackages = () => {
-  const queryClient = useQueryClient();
-
-  const { mutate: selectPackage, isPending } = useMutation({
-    mutationFn: projectsApi.selectPackage,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-    },
-  });
+  const createProject = useMutation({
+    mutationFn: (packageId: PackageType) => projectsApi.createProject(packageId),
+  })
 
   return {
     packages,
-    selectPackage,
-    isPending,
-  };
-};
+    createProject,
+    isPending: createProject.isPending
+  }
+}

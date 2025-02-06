@@ -1,9 +1,11 @@
-export const packages = [
+import { PackageData } from '@/features/projects/types/types';
+
+export const packages: PackageData[] = [
   {
-    id: 'static',
-    title: 'Static Frontend',
-    priceEUR: '600',
-    priceSEK: '6,300',
+    type: 'static',
+    name: 'Static Frontend',
+    priceEUR: 600,
+    priceSEK: 6300,
     features: [
       'Modern TypeScript-based front end',
       'Responsive & mobile-friendly design',
@@ -16,11 +18,10 @@ export const packages = [
     ],
   },
   {
-    id: 'fullstack',
-    title: 'Full Stack',
-    priceEUR: '1,100',
-    priceSEK: '11,200',
-    recommended: true,
+    type: 'fullstack',
+    name: 'Full Stack',
+    priceEUR: 1100,
+    priceSEK: 11200,
     features: [
       'Everything in Static Frontend',
       'Django-based back end',
@@ -31,12 +32,13 @@ export const packages = [
       'Admin dashboard & management tools',
       '30 days developer support',
     ],
+    recommended: true,
   },
   {
-    id: 'enterprise',
-    title: 'Enterprise',
-    priceEUR: '2,000',
-    priceSEK: '20,200',
+    type: 'enterprise',
+    name: 'Enterprise',
+    priceEUR: 2000,
+    priceSEK: 20200,
     features: [
       'Everything in Full Stack',
       'Advanced security & authentication',
@@ -49,4 +51,4 @@ export const packages = [
       'CI/CD pipeline setup',
     ],
   },
-]
+];

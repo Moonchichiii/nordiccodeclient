@@ -10,12 +10,9 @@ interface SaveAddonsParams {
 export const useAddons = () => {
   const queryClient = useQueryClient()
 
-  const { mutate: saveAddons, isPending } = useMutation({
-    mutationFn: ({ packageId, selectedAddons }: SaveAddonsParams) => 
-      projectsApi.saveAddons({
-        package_id: packageId,
-        addons: Array.from(selectedAddons)
-      }),
+  const saveAddons = useMutation({
+    mutationFn: ({ projectId, addons }: { projectId: number; addons: number[] }) =>
+      projectsApi.saveAddons(projectId, addons),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
     }
@@ -25,6 +22,6 @@ export const useAddons = () => {
     addons,
     enterpriseIncludedAddons,
     saveAddons,
-    isPending
+    isPending: saveAddons.isPending
   }
 }

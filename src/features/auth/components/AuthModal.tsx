@@ -9,163 +9,180 @@ import { authApi } from '@/features/auth/api/auth.api';
 import { toast } from 'react-toastify';
 
 interface AuthModalProps {
-    isOpen: boolean;
-    initialMode: 'login' | 'register';
-    onClose: () => void;
-    onSuccess?: () => void;
+  isOpen: boolean;
+  initialMode: 'login' | 'register';
+  onClose: () => void;
+  onSuccess?: () => void;
 }
 
 interface VerificationStateProps {
-    email: string;
-    onResendEmail: (email: string) => Promise<void>;
+  email: string;
+  onResendEmail: (email: string) => Promise<void>;
 }
 
 const VerificationState: React.FC<VerificationStateProps> = ({ email, onResendEmail }) => (
-    <div className="text-center space-y-4">
-        <Loader2 className="h-12 w-12 animate-spin text-yellow-500 mx-auto" />
-        <h3 className="text-lg font-medium text-gray-200">Verify Your Email</h3>
-        <p className="text-sm text-gray-400">
-            We've sent a verification link to {email}
-        </p>
-        <button
-            onClick={() => onResendEmail(email)}
-            className="w-full py-2 rounded-lg bg-gray-800 text-gray-400 hover:text-yellow-500 
-                     transition-colors duration-300"
-        >
-            Resend Email
-        </button>
+  <div className="text-center space-y-6 px-4">
+    <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+    <div>
+      <h3 className="text-xl font-light text-foreground mb-2">Verify Your Email</h3>
+      <p className="text-foreground-alt">
+        We've sent a verification link to <span className="text-foreground">{email}</span>
+      </p>
     </div>
+    <button
+      onClick={() => onResendEmail(email)}
+      className="w-full py-3 rounded-full bg-background-alt text-foreground-alt hover:text-primary
+        transition-colors duration-300 border border-primary/10 hover:border-primary/30"
+    >
+      Resend Email
+    </button>
+  </div>
 );
 
-export const AuthModal: React.FC<AuthModalProps> = ({ 
-    isOpen, 
-    initialMode, 
-    onClose, 
-    onSuccess 
+export const AuthModal: React.FC<AuthModalProps> = ({
+  isOpen,
+  initialMode,
+  onClose,
+  onSuccess
 }) => {
-    const [mode, setMode] = useState<AuthMode>(initialMode);
-    const [showVerification, setShowVerification] = useState(false);
-    const [registeredEmail, setRegisteredEmail] = useState('');
+  const [mode, setMode] = useState<AuthMode>(initialMode);
+  const [showVerification, setShowVerification] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
-    useEffect(() => {
-        setMode(initialMode);
-    }, [initialMode]);
+  useEffect(() => {
+    setMode(initialMode);
+  }, [initialMode]);
 
-    const handleModeChange = (newMode: AuthMode) => {
-        setMode(newMode);
-    };
+  const handleModeChange = (newMode: AuthMode) => {
+    setMode(newMode);
+  };
 
-    const handleRegistrationComplete = (email: string) => {
-        setRegisteredEmail(email);
-        setShowVerification(true);
-        localStorage.setItem('pendingVerificationEmail', email);
-    };
+  const handleRegistrationComplete = (email: string) => {
+    setRegisteredEmail(email);
+    setShowVerification(true);
+    localStorage.setItem('pendingVerificationEmail', email);
+  };
 
-    const handleResendEmail = async (email: string) => {
-        try {
-            await authApi.resendVerificationEmail(email);
-            toast.success('Verification email resent');
-        } catch {
-            toast.error('Failed to resend email');
-        }
-    };
+  const handleResendEmail = async (email: string) => {
+    try {
+      await authApi.resendVerificationEmail(email);
+      toast.success('Verification email resent');
+    } catch {
+      toast.error('Failed to resend email');
+    }
+  };
 
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
-    return (
-        <div className="fixed inset-0 z-[100] overflow-y-auto">
-            <div className="min-h-screen px-4 flex items-center justify-center">
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto">
+      <div className="min-h-screen w-full px-4 py-20 flex items-center justify-center">
+        <div 
+          className="fixed inset-0 bg-background/95 backdrop-blur-md" 
+          onClick={onClose} 
+        />
 
-                <div
-                    className={`relative w-full transform overflow-hidden rounded-xl 
-                        bg-gray-900 p-4 shadow-xl transition-all duration-500 ease-out
-                        ${mode === 'register' ? 'max-w-3xl' : 'max-w-md'}`}
-                    style={{
-                        boxShadow: '0 0 50px rgba(0, 0, 0, 0.5)',
-                        transform: mode === 'register' ? 'translateX(0)' : 'none'
-                    }}
-                >
-                    <button
-                        onClick={onClose}
-                        className="absolute right-4 top-4 p-1 rounded-lg hover:bg-gray-800/50 
-                                 transition-all duration-300"
-                    >
-                        <X className="h-4 w-4 text-gray-400" />
-                    </button>
+        <div
+          className={`relative w-full transform overflow-hidden rounded-3xl
+            bg-background border border-primary/10 shadow-2xl shadow-primary/5 
+            transition-all duration-500 ease-out
+            ${mode === 'register' ? 'max-w-4xl' : 'max-w-lg'}`}
+        >
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute -right-3 -top-3 p-3 rounded-full bg-background hover:bg-primary/5 
+              text-foreground-alt hover:text-foreground transition-colors focus:outline-none 
+              focus-visible:ring-2 focus-visible:ring-primary/50 z-[60] border border-primary/10
+              shadow-lg hover:shadow-xl"
+            aria-label="Close modal"
+          >
+            <X className="h-5 w-5" />
+          </button>
 
-                    {mode === 'forgot-password' && (
-                        <button
-                            onClick={() => handleModeChange('login')}
-                            className="absolute left-4 top-4 p-1 rounded-lg hover:bg-gray-800/50
-                                     transition-all duration-300 group"
-                        >
-                            <ArrowLeft className="h-4 w-4 text-gray-400" />
-                        </button>
-                    )}
+          {/* Back Button for Forgot Password */}
+          {mode === 'forgot-password' && (
+            <button
+              onClick={() => handleModeChange('login')}
+              className="absolute left-6 top-6 p-2 rounded-full hover:bg-primary/5
+                transition-colors duration-300 group"
+            >
+              <ArrowLeft className="h-5 w-5 text-foreground-alt group-hover:text-foreground" />
+            </button>
+          )}
 
-                    <div className="text-center mb-4">
-                        <h3 className="text-lg font-semibold bg-gradient-to-r from-yellow-500 to-yellow-200 bg-clip-text text-transparent">
-                            {mode === 'login'
-                                ? 'Welcome Back'
-                                : mode === 'register'
-                                ? 'Create Account'
-                                : 'Reset Password'}
-                        </h3>
-                        <p className="mt-1 text-sm text-gray-400">
-                            {mode === 'login'
-                                ? 'Sign in to continue to your account'
-                                : mode === 'register'
-                                ? 'Fill in your details to create an account'
-                                : 'Enter your email to receive a reset link'}
-                        </p>
-                    </div>
-
-                    {!showVerification ? (
-                        <>
-                            {mode === 'login' && (
-                                <>
-                                    <LoginForm
-                                        onSuccess={onSuccess}
-                                        onClose={onClose}
-                                        onModeChange={handleModeChange}
-                                    />
-                                    <div className="relative mt-6">
-                                        <div className="absolute inset-0 flex items-center">
-                                            <div className="w-full border-t border-gray-700/50"></div>
-                                        </div>
-                                        <div className="relative flex justify-center text-sm mb-4">
-                                            <span className="px-2 bg-gray-900 text-gray-400">
-                                                Or continue with
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <GoogleSignInButton onSuccess={onSuccess} onClose={onClose} />
-                                </>
-                            )}
-                            {mode === 'register' && (
-                                <RegisterForm
-                                    onModeChange={handleModeChange}
-                                    onRegistrationComplete={handleRegistrationComplete}
-                                />
-                            )}
-                            {mode === 'forgot-password' && (
-                                <ForgotPasswordForm
-                                    onClose={onClose}
-                                    onModeChange={handleModeChange}
-                                />
-                            )}
-                        </>
-                    ) : (
-                        <VerificationState
-                            email={registeredEmail}
-                            onResendEmail={handleResendEmail}
-                        />
-                    )}
-                </div>
+          <div className="p-8 sm:p-10">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h3 className="text-3xl font-light">
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">
+                  {mode === 'login'
+                    ? 'Welcome Back'
+                    : mode === 'register'
+                    ? 'Create Account'
+                    : 'Reset Password'}
+                </span>
+              </h3>
+              <p className="mt-2 text-foreground-alt">
+                {mode === 'login'
+                  ? 'Sign in to continue to your account'
+                  : mode === 'register'
+                  ? 'Fill in your details to create an account'
+                  : 'Enter your email to receive a reset link'}
+              </p>
             </div>
+
+            {/* Form Content */}
+            <div className={mode === 'register' ? 'px-4' : ''}>
+              {!showVerification ? (
+                <>
+                  {mode === 'login' && (
+                    <>
+                      <LoginForm
+                        onSuccess={onSuccess}
+                        onClose={onClose}
+                        onModeChange={handleModeChange}
+                      />
+                      <div className="relative mt-8">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-primary/10"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                          <span className="px-4 bg-background text-foreground-alt">
+                            Or continue with
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mt-6">
+                        <GoogleSignInButton onSuccess={onSuccess} onClose={onClose} />
+                      </div>
+                    </>
+                  )}
+                  {mode === 'register' && (
+                    <RegisterForm
+                      onModeChange={handleModeChange}
+                      onRegistrationComplete={handleRegistrationComplete}
+                    />
+                  )}
+                  {mode === 'forgot-password' && (
+                    <ForgotPasswordForm
+                      onClose={onClose}
+                      onModeChange={handleModeChange}
+                    />
+                  )}
+                </>
+              ) : (
+                <VerificationState
+                  email={registeredEmail}
+                  onResendEmail={handleResendEmail}
+                />
+              )}
+            </div>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default AuthModal;

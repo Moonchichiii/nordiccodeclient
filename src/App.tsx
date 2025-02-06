@@ -8,7 +8,6 @@ import Layout from '@/components/layout/Layout';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import ProtectedRoute from '@/features/auth/ProtectedRoute';
 import CookieConsent from '@/components/common/CookieConsent';
-import Home from '@/pages/home/Home';
 
 interface LazyComponent<T> extends React.LazyExoticComponent<T> {
   preload: () => Promise<{ default: T }>;
@@ -22,13 +21,11 @@ const lazyWithPrefetch = <T extends React.ComponentType<any>>(
   return Component;
 };
 
-const Services = lazyWithPrefetch(() => import('@/pages/services/Services'));
-const Portfolio = lazyWithPrefetch(() => import('@/pages/portfolio/Portfolio'));
-const Contact = lazyWithPrefetch(() => import('@/pages/contact/Contact'));
-const NotFound = lazyWithPrefetch(() => import('@/pages/error/NotFound'));
+// Lazy load components
 const EmailConfirmationModal = lazyWithPrefetch(() => import('@/features/auth/components/EmailConfirmationModal'));
 const Dashboard = lazyWithPrefetch(() => import('@/pages/dashboard/Dashboard'));
 const Settings = lazyWithPrefetch(() => import('@/pages/settings/Settings'));
+const NotFound = lazyWithPrefetch(() => import('@/pages/error/NotFound'));
 
 const App = (): ReactElement => {
   return (
@@ -38,26 +35,29 @@ const App = (): ReactElement => {
           <div className="relative">
             <Suspense fallback={<LoadingScreen />}>
               <Routes>
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<Home />} />
-                  <Route path="services" element={<Services />} />
-                  <Route path="portfolio" element={<Portfolio />} />
-                  <Route path="contact" element={<Contact />} />
-                  <Route path="/verify-email/:key" element={<EmailConfirmationModal />} />
-                  <Route
-                    path="dashboard/*"
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    }
-                  >
-                    <Route path="settings" element={<Settings />} />
-                  </Route>
-                  <Route path="*" element={<NotFound />} />
+                {/* Main landing page with scroll sections */}
+                <Route path="/" element={<Layout />} />
+                
+                {/* Auth routes */}
+                <Route path="/verify-email/:key" element={<EmailConfirmationModal />} />
+                
+                {/* Protected routes */}
+                <Route
+                  path="/dashboard/*"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route path="settings" element={<Settings />} />
                 </Route>
+
+                {/* 404 */}
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
+
             <ToastContainer
               position="top-right"
               autoClose={3000}

@@ -3,7 +3,7 @@ import {
     useMutation,
     useQueryClient 
   } from '@tanstack/react-query';
-  import { billingApi } from '@/features/billing/api/api.billing';
+  import { billingApi } from '@/features/billing/api/billing';
   
   export function usePaymentMethods() {
     const queryClient = useQueryClient();

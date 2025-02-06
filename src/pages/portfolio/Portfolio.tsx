@@ -1,8 +1,7 @@
-import { FC, useState } from 'react';
+import { FC, useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ExternalLink } from 'lucide-react';
+import { ArrowRight, ExternalLink, ArrowUpRight } from 'lucide-react';
 import { gsap } from 'gsap';
-import { useEffect } from 'react';
 
 interface Project {
   id: number;
@@ -35,18 +34,57 @@ const projects: Project[] = [
 const Portfolio: FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
   const navigate = useNavigate();
+  const headerRef = useRef<HTMLElement>(null);
+  const projectsRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from('.portfolio-content', {
+    const mm = gsap.matchMedia();
+    
+    mm.add('(min-width: 768px)', () => {
+      const tl = gsap.timeline({
+        defaults: { ease: 'power3.out' }
+      });
+
+      // Header animations
+      tl.from(headerRef.current, {
         y: 30,
         opacity: 0,
         duration: 0.8,
-        ease: 'power3.out'
+      }).from(headerRef.current?.querySelectorAll('button'), {
+        y: 20,
+        opacity: 0,
+        stagger: 0.1,
+        duration: 0.5,
+      }, '-=0.4');
+
+      // Project list animations
+      gsap.from(projectsRef.current?.children, {
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        scrollTrigger: {
+          trigger: projectsRef.current,
+          start: 'top center+=100',
+          toggleActions: 'play none none reverse',
+        }
+      });
+
+      // CTA animation
+      gsap.from(ctaRef.current, {
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        scrollTrigger: {
+          trigger: ctaRef.current,
+          start: 'top bottom-=100',
+          toggleActions: 'play none none reverse',
+        }
       });
     });
 
-    return () => ctx.revert();
+    return () => mm.revert();
   }, []);
 
   const categories = [
@@ -56,13 +94,15 @@ const Portfolio: FC = () => {
   ];
 
   return (
-    <main className="min-h-screen bg-gray-900 text-white py-20 px-4">
-      <div className="portfolio-content max-w-6xl mx-auto">
+    <main className="min-h-screen bg-background text-foreground py-20 px-4">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <header className="mb-16">
+        <header ref={headerRef} className="mb-16">
           <h1 className="text-5xl sm:text-6xl font-light mb-8">
-            <span className="block">Our Latest</span>
-            <span className="block gradient-text">Projects</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">
+              Our Latest
+            </span>
+            <span className="block">Projects</span>
           </h1>
           
           <div className="flex gap-4 flex-wrap">
@@ -70,52 +110,53 @@ const Portfolio: FC = () => {
               <button
                 key={category.label}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`px-6 py-2 rounded-lg transition-all ${
+                className={`group px-6 py-2 rounded-[2rem] hover:rounded-xl transition-all duration-300 ${
                   selectedCategory === category.id
-                    ? 'bg-yellow-500 text-gray-900'
-                    : 'border border-gray-800 hover:border-yellow-500/30'
+                    ? 'bg-primary text-white'
+                    : 'border border-primary/20 hover:border-primary text-foreground-alt hover:text-primary'
                 }`}
               >
-                {category.label}
+                <span className="flex items-center gap-2">
+                  {category.label}
+                  <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all" />
+                </span>
               </button>
             ))}
           </div>
         </header>
 
         {/* Projects Grid */}
-        <section className="space-y-6">
-          <div className="grid grid-cols-12 text-sm text-gray-400 px-4 mb-4">
+        <section className="space-y-6 mb-20">
+          <div className="grid grid-cols-12 text-sm text-foreground-alt px-4 mb-4">
             <div className="col-span-3">Project</div>
             <div className="hidden md:block col-span-3">Location</div>
             <div className="hidden md:block col-span-4">Services</div>
             <div className="hidden md:block col-span-2">Year</div>
           </div>
 
-          <div className="space-y-2">
+          <div ref={projectsRef} className="space-y-3">
             {projects.map((project) => (
               <div
                 key={project.id}
                 onClick={() => navigate(project.link)}
-                className="grid grid-cols-12 items-center p-4 rounded-lg hover:bg-gray-800/50 
-                  cursor-pointer group transition-all"
+                className="group grid grid-cols-12 items-center p-6 rounded-2xl border border-primary/10 
+                  hover:border-primary/20 cursor-pointer transition-all duration-300 bg-background"
               >
                 <div className="col-span-12 md:col-span-3">
-                  <h3 className="text-xl font-light group-hover:text-yellow-500 transition-colors">
+                  <h3 className="text-xl font-light text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
                     {project.title}
+                    <ArrowUpRight className="w-5 h-5 opacity-0 group-hover:opacity-100 
+                      group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                   </h3>
                 </div>
-                <div className="hidden md:block col-span-3 text-gray-400">
+                <div className="hidden md:block col-span-3 text-foreground-alt">
                   {project.location}
                 </div>
-                <div className="hidden md:block col-span-4 text-gray-400">
+                <div className="hidden md:block col-span-4 text-foreground-alt">
                   {project.services}
                 </div>
-                <div className="hidden md:block col-span-1 text-gray-400">
+                <div className="hidden md:block col-span-2 text-foreground-alt">
                   {project.year}
-                </div>
-                <div className="col-span-1 flex justify-end">
-                  <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 
-                    group-hover:translate-x-1 transition-all text-yellow-500" />
                 </div>
               </div>
             ))}
@@ -123,14 +164,16 @@ const Portfolio: FC = () => {
         </section>
 
         {/* CTA */}
-        <div className="text-center mt-20">
+        <div ref={ctaRef} className="text-center">
           <button 
             onClick={() => navigate('/contact')}
-            className="group px-8 py-3 bg-yellow-500 text-gray-900 rounded-lg 
-              hover:bg-yellow-400 transition-all duration-300 inline-flex items-center gap-2"
+            className="group relative px-8 py-4 text-base font-medium overflow-hidden
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50
+              focus-visible:ring-offset-2 rounded-[2rem] hover:rounded-xl transition-all
+              bg-primary text-white hover:bg-primary-light inline-flex items-center gap-2"
           >
-            Start a Project
-            <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            <span>Start a Project</span>
+            <ExternalLink className="w-5 h-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </button>
         </div>
       </div>
