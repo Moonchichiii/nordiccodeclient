@@ -68,6 +68,31 @@
     --chart-5: 340 75% 55%;
   }
 
+  @media (forced-colors: active) {
+    :root {
+      --primary: Canvas;
+      --foreground: CanvasText;
+      --background: Canvas;
+      --border: CanvasText;
+    }
+    
+    /* Force high contrast colors */
+    .btn-primary {
+      forced-color-adjust: none;
+      background-color: ButtonText;
+      color: ButtonFace;
+    }
+
+    .btn-ghost {
+      forced-color-adjust: none;
+      border: 1px solid ButtonText;
+    }
+
+    .nav-link::after {
+      background-color: LinkText;
+    }
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
   }
@@ -139,6 +164,9 @@
       transparent
     );
   }
+  .perspective-1000 {
+    perspective: 1000px;
+  }
 }
 
 @keyframes accordion-down {
@@ -162,4 +190,3 @@
 .clip-custom {
     clip-path: polygon(0% 0%, 100% 0%, 95% 50%, 100% 100%, 0% 100%, 5% 50%);
   }
-  

@@ -38,16 +38,18 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
-        ws: true,  // This enables WebSocket proxying
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
+        ws: true,
+        cookieDomainRewrite: 'localhost',
+        cookiePathRewrite: '/',
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
             console.log('proxy error', err);
           });
-          proxy.on('proxyReq', (proxyReq, req, res) => {
-            console.log('Sending Request to the Target:', req.method, req.url);
+          proxy.on('proxyReq', (proxyReq, _req, _res) => {
+            console.log('Sending Request to the Target:', proxyReq.method, proxyReq.path);
           });
-          proxy.on('proxyRes', (proxyRes, req, res) => {
-            console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+          proxy.on('proxyRes', (proxyRes, _req, _res) => {
+            console.log('Received Response from the Target:', proxyRes.statusCode, (proxyRes as any).req?.url);
           });
         },
       },
@@ -105,7 +107,7 @@ export default defineConfig({
       '@tanstack/react-query',
       'react-hook-form',
       'zod',
-      'axios',
+      'axios',      
     ],
   },
   preview: {

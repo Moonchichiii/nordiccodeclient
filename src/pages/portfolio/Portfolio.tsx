@@ -4,15 +4,15 @@ import { ArrowRight, ExternalLink, ArrowUpRight } from 'lucide-react';
 import { gsap } from 'gsap';
 
 interface Project {
-  id: number;
-  title: string;
-  location: string;
-  services: string;
-  year: string;
-  link: string;
+  readonly id: number;
+  readonly title: string;
+  readonly location: string;
+  readonly services: string;
+  readonly year: string;
+  readonly link: string;
 }
 
-const projects: Project[] = [
+const projects: readonly Project[] = [
   {
     id: 1,
     title: "E-commerce Platform",
@@ -31,6 +31,12 @@ const projects: Project[] = [
   }
 ];
 
+const categories = [
+  { id: undefined, label: 'All' },
+  { id: 'Dev', label: 'Development' },
+  { id: 'Design', label: 'Design' }
+];
+
 const Portfolio: FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
   const navigate = useNavigate();
@@ -40,13 +46,10 @@ const Portfolio: FC = () => {
 
   useEffect(() => {
     const mm = gsap.matchMedia();
-    
-    mm.add('(min-width: 768px)', () => {
-      const tl = gsap.timeline({
-        defaults: { ease: 'power3.out' }
-      });
 
-      // Header animations
+    mm.add('(min-width: 768px)', () => {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
       tl.from(headerRef.current, {
         y: 30,
         opacity: 0,
@@ -58,7 +61,6 @@ const Portfolio: FC = () => {
         duration: 0.5,
       }, '-=0.4');
 
-      // Project list animations
       gsap.from(projectsRef.current?.children, {
         y: 20,
         opacity: 0,
@@ -71,7 +73,6 @@ const Portfolio: FC = () => {
         }
       });
 
-      // CTA animation
       gsap.from(ctaRef.current, {
         y: 20,
         opacity: 0,
@@ -87,16 +88,9 @@ const Portfolio: FC = () => {
     return () => mm.revert();
   }, []);
 
-  const categories = [
-    { id: undefined, label: 'All' },
-    { id: 'Dev', label: 'Development' },
-    { id: 'Design', label: 'Design' }
-  ];
-
   return (
     <main className="min-h-screen bg-background text-foreground py-20 px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <header ref={headerRef} className="mb-16">
           <h1 className="text-5xl sm:text-6xl font-light mb-8">
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">
@@ -125,7 +119,6 @@ const Portfolio: FC = () => {
           </div>
         </header>
 
-        {/* Projects Grid */}
         <section className="space-y-6 mb-20">
           <div className="grid grid-cols-12 text-sm text-foreground-alt px-4 mb-4">
             <div className="col-span-3">Project</div>
@@ -163,7 +156,6 @@ const Portfolio: FC = () => {
           </div>
         </section>
 
-        {/* CTA */}
         <div ref={ctaRef} className="text-center">
           <button 
             onClick={() => navigate('/contact')}

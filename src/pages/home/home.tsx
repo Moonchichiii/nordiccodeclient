@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 import ProjectFlowModal from './ProjectFlowModal';
 
-const Home = () => {
+const Home: React.FC = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const heroRef = useRef<HTMLElement>(null);

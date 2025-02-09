@@ -146,7 +146,7 @@ const ProjectFlowModal: FC<ProjectFlowModalProps> = ({ isOpen, onClose, openAuth
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute right-6 top-6 p-2 rounded-full hover:bg-primary/5 text-foreground-alt 
+            className="absolute right-2 top-3 p-2 rounded-full hover:bg-primary/5 text-foreground-alt 
               hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 
               focus-visible:ring-primary/50"
             aria-label="Close modal"

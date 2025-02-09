@@ -91,7 +91,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute -right-3 -top-3 p-3 rounded-full bg-background hover:bg-primary/5 
+            className="absolute right-2 top-2 p-4 rounded-full bg-background hover:bg-primary/5 
               text-foreground-alt hover:text-foreground transition-colors focus:outline-none 
               focus-visible:ring-2 focus-visible:ring-primary/50 z-[60] border border-primary/10
               shadow-lg hover:shadow-xl"

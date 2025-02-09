@@ -21,6 +21,8 @@ const lazyWithPrefetch = <T extends React.ComponentType<any>>(
   return Component;
 };
 
+
+
 // Lazy load components
 const EmailConfirmationModal = lazyWithPrefetch(() => import('@/features/auth/components/EmailConfirmationModal'));
 const Dashboard = lazyWithPrefetch(() => import('@/pages/dashboard/Dashboard'));
@@ -79,5 +81,6 @@ const App = (): ReactElement => {
     </QueryClientProvider>
   );
 };
+
 
 export default App;

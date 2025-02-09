@@ -1,4 +1,5 @@
 import React from 'react';
+import { Check } from 'lucide-react';
 
 interface CheckboxGroupProps {
   label: string;
@@ -17,18 +18,26 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ label, options, selected,
   };
 
   return (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-300 mb-2">{label}</label>
-      <div className="space-y-1">
+    <div className="space-y-3">
+      <label className="text-sm font-medium text-foreground">{label}</label>
+      <div className="space-y-2">
         {options.map(opt => (
-          <label key={opt} className="flex items-center space-x-2 text-gray-300">
-            <input
-              type="checkbox"
-              checked={selected.includes(opt)}
-              onChange={() => handleToggle(opt)}
-              className="form-checkbox text-yellow-500"
-            />
-            <span className="text-sm">{opt}</span>
+          <label
+            key={opt}
+            className="flex items-center space-x-3 cursor-pointer"
+          >
+            <div
+              className={`h-4 w-4 rounded border transition-colors ${
+                selected.includes(opt)
+                  ? 'bg-primary border-primary'
+                  : 'border-input hover:border-primary/50'
+              } flex items-center justify-center`}
+            >
+              {selected.includes(opt) && (
+                <Check className="h-3 w-3 text-primary-foreground" />
+              )}
+            </div>
+            <span className="text-sm text-foreground">{opt}</span>
           </label>
         ))}
       </div>

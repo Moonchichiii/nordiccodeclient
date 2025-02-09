@@ -31,10 +31,18 @@ const PlannerPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl text-white mb-4">Project Requirements</h1>
-      <PlannerForm onSubmit={handleSubmit} />
-    </div>
+    <div className="container mx-auto px-4 sm:px-6 pb-32 lg:pb-6 pt-6">
+      <div className="max-w-4xl mx-auto">
+        
+        </div>
+
+        <div className="rounded-xl bg-background border border-border/50">
+          <div className="p-4 sm:p-6">
+            <PlannerForm onSubmit={handleSubmit} />
+          </div>
+        </div>
+      </div>
+    
   );
 };
 

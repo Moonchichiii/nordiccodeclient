@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss';
+import type { Config } from 'tailwindcss'
 import forms from '@tailwindcss/forms';
 import typography from '@tailwindcss/typography';
 import animate from 'tailwindcss-animate';
@@ -26,7 +26,7 @@ export default {
       '2xl': '96rem',
       hover: { raw: '(hover: hover)' },
       'reduced-motion': { raw: '(prefers-reduced-motion: reduce)' },
-      'high-contrast': { raw: '(prefers-contrast: high)' },
+      'forced-colors': { raw: '(forced-colors: active)' },
       dawn: { raw: '(preference: dawn)' },
       day: { raw: '(preference: day)' },
       dusk: { raw: '(preference: dusk)' },
@@ -262,7 +262,7 @@ export default {
       addVariant('secure-hover', '&:hover:not([data-security="disabled"])');
       addVariant('secure-focus', '&:focus:not([data-security="disabled"])');
       addVariant('reduced-motion', '@media (prefers-reduced-motion: reduce)');
-      addVariant('high-contrast', '@media (prefers-contrast: high)');
+      addVariant('forced-colors', '@media (forced-colors: active)');
       addVariant('form-valid', '&[data-valid="true"]');
       addVariant('form-invalid', '&[data-invalid="true"]');
       addVariant('form-touched', '&[data-touched="true"]');

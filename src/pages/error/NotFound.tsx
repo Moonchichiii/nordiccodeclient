@@ -88,7 +88,7 @@ const NotFound = (): JSX.Element => {
           >
             <div className="text-foreground-alt">
               <span className="text-primary-light">const</span>{" "}
-              <span className="text-primary">findPage</span> = () =>{" "}
+              <span className="text-primary">findPage</span> = () => {" "}
               <span className="text-primary-light">{"{"}</span>
             </div>
             <div className="pl-4">

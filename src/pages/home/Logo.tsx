@@ -13,8 +13,6 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
   const codeRef = useRef<HTMLDivElement>(null);
   const worksRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const imageContainerRef = useRef<HTMLDivElement>(null);
-  const maskRef = useRef<SVGPathElement>(null);
 
   useEffect(() => {
     const mm = gsap.matchMedia();
@@ -50,11 +48,10 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
       aria-label="Hero section"
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-        <div
-          ref={logoContainerRef}
-          className="relative cursor-pointer transform-gpu mx-auto lg:mx-0 order-2 lg:order-1"
-          style={{ perspective: '1000px' }}
-        >
+      <div
+  ref={logoContainerRef}
+  className="relative cursor-pointer transform-gpu mx-auto lg:mx-0 order-2 lg:order-1 perspective-1000"
+>
           <div
             ref={logoWrapperRef}
             className="relative grid place-items-center gap-3 select-none"
