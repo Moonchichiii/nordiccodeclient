@@ -1,3 +1,4 @@
+// src/features/projects/components/shared/PackageInfo.tsx
 import { PackageData } from '@/features/projects/types/types';
 
 interface PackageInfoProps {

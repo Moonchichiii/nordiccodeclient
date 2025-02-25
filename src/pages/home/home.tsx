@@ -4,10 +4,14 @@ import { gsap } from 'gsap';
 import { useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 import ProjectFlowModal from './ProjectFlowModal';
+import InfiniteScroller from '@/pages/home/InfiniteScroller';
 
+/**
+ * Home page component with animated UI elements and navigation
+ */
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const heroRef = useRef<HTMLElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
@@ -18,6 +22,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const mm = gsap.matchMedia();
+    
     mm.add('(min-width: 768px)', () => {
       const heroTimeline = gsap.timeline({
         defaults: { ease: 'power3.out', duration: 0.8 },
@@ -75,6 +80,18 @@ const Home: React.FC = () => {
     return () => mm.revert();
   }, []);
 
+  const handleServicesClick = (): void => {
+    navigate('/services');
+  };
+
+  const handleProjectClick = (): void => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = (): void => {
+    setIsModalOpen(false);
+  };
+
   return (
     <>
       <main className="relative min-h-[100dvh] w-full bg-gradient-to-b from-background via-background to-background/95 text-foreground">
@@ -82,7 +99,7 @@ const Home: React.FC = () => {
         
         <article
           ref={heroRef}
-          className="relative min-h-[calc(100dvh-5rem)] pt-20 flex flex-col items-center justify-center"
+          className="relative min-h-[calc(100dvh-5rem)] pt-15 flex flex-col items-center justify-center"
         >
           <div className="w-full max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
             <div ref={logoRef} className="w-full transform-gpu">
@@ -96,7 +113,7 @@ const Home: React.FC = () => {
             >
               <button
                 ref={servicesButtonRef}
-                onClick={() => navigate('/services')}
+                onClick={handleServicesClick}
                 className="group relative px-8 py-4 bg-primary text-white text-base md:text-lg font-medium overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 hover:bg-primary-light transition-colors duration-300 sm:flex-1 rounded-[2rem] hover:rounded-xl transition-all"
                 aria-label="View our services"
               >
@@ -114,7 +131,7 @@ const Home: React.FC = () => {
 
               <button
                 ref={contactButtonRef}
-                onClick={() => setIsModalOpen(true)}
+                onClick={handleProjectClick}
                 className="group relative px-8 py-4 text-base md:text-lg font-medium overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 sm:flex-1 [clip-path:polygon(0%_0%,100%_0%,95%_50%,100%_100%,0%_100%,5%_50%)]"
                 aria-label="Start your project"
               >
@@ -128,12 +145,15 @@ const Home: React.FC = () => {
                   <span>Start Your Project</span>
                   <ExternalLink className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
                 </div>
-              </button>
+              </button>              
             </nav>
+            <div className="mt-5">
+              <InfiniteScroller />
+            </div>
           </div>
         </article>
       </main>
-      <ProjectFlowModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ProjectFlowModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </>
   );
 };

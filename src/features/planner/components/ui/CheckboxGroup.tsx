@@ -20,24 +20,38 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ label, options, selected,
   return (
     <div className="space-y-3">
       <label className="text-sm font-medium text-foreground">{label}</label>
-      <div className="space-y-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {options.map(opt => (
           <label
             key={opt}
-            className="flex items-center space-x-3 cursor-pointer"
+            className={`
+              group relative flex items-center gap-3 p-4 rounded-xl border cursor-pointer
+              overflow-hidden transition-all duration-300 hover:shadow-md
+              ${selected.includes(opt)
+                ? 'border-primary bg-primary/5'
+                : 'border-border hover:border-primary/50 hover:bg-accent/5'}
+            `}
           >
-            <div
-              className={`h-4 w-4 rounded border transition-colors ${
-                selected.includes(opt)
-                  ? 'bg-primary border-primary'
-                  : 'border-input hover:border-primary/50'
-              } flex items-center justify-center`}
-            >
-              {selected.includes(opt) && (
-                <Check className="h-3 w-3 text-primary-foreground" />
-              )}
+            <div className={`
+              w-5 h-5 rounded-md border flex items-center justify-center
+              transition-colors duration-300
+              ${selected.includes(opt)
+                ? 'bg-primary border-primary text-primary-foreground'
+                : 'border-border group-hover:border-primary/50'}
+            `}>
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={selected.includes(opt)}
+                onChange={() => handleToggle(opt)}
+              />
+              {selected.includes(opt) && <Check className="w-3 h-3" />}
             </div>
-            <span className="text-sm text-foreground">{opt}</span>
+            <span className="text-sm text-foreground group-hover:text-primary transition-colors">
+              {opt}
+            </span>
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 
+                         opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
           </label>
         ))}
       </div>

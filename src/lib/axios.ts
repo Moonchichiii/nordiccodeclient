@@ -62,3 +62,5 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
+
+export { AxiosError } from 'axios';

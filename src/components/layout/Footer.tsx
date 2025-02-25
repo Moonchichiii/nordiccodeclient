@@ -1,211 +1,184 @@
 import { useState } from 'react';
-import { ChevronRight, Github, Linkedin, FileCode, Briefcase, MessageCircle, Cookie, Mail, DivideIcon as LucideIcon, X, ArrowUpRight, MapPin, Phone } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Github, Linkedin, X, Mail, MapPin, Phone, ArrowUpRight, Cookie } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useScrollTo } from '@/hooks/useScrollTo';
 import CookieConsent from '@/components/common/CookieConsent';
 
 interface SocialLinkProps {
   href: string;
-  icon: LucideIcon;
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
 }
 
-const SocialLink: React.FC<SocialLinkProps> = ({ href, icon: Icon, label }) => (
+const SocialLink = ({ href, icon: Icon, label }: SocialLinkProps) => (
   <a
     href={href}
-    className="group relative flex items-center justify-center w-12 h-12 rounded-xl
-      bg-primary/5 hover:bg-primary/10 transition-all duration-300
-      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+    className="group relative flex items-center justify-center w-10 h-10 rounded-xl
+      bg-primary/5 hover:bg-primary/10 transition-all duration-300 hover:scale-110"
     target="_blank"
     rel="noopener noreferrer"
     aria-label={label}
   >
-    <Icon className="w-5 h-5 text-primary transition-transform duration-300 group-hover:scale-110" />
-    <div className="absolute inset-0 rounded-xl bg-primary/5 group-hover:scale-110 transition-transform duration-300" />
+    <Icon className="w-4 h-4 text-primary transition-transform duration-300" />
   </a>
 );
 
-interface FooterLinkProps {
-  href?: string;
-  children: React.ReactNode;
-  external?: boolean;
-  onClick?: () => void;
-}
-
-const FooterLink: React.FC<FooterLinkProps> = ({
-  href,
-  children,
-  external = false,
-  onClick
-}) => {
-  const Component = external ? 'a' : Link;
-  const props = external
-    ? { href, target: '_blank', rel: 'noopener noreferrer' }
-    : onClick
-    ? { onClick, href: '#', role: 'button', tabIndex: 0 }
-    : { to: href };
-
-  return (
-    <Component
-      {...props}
-      className="group inline-flex items-center text-sm text-foreground-alt hover:text-foreground
-        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50
-        transition-colors duration-300 relative py-2"
-    >
-      <ChevronRight
-        className="w-4 h-4 mr-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0
-          transition-all duration-300"
-        aria-hidden="true"
-      />
-      <span className="relative">
-        {children}
-        <span
-          className="absolute bottom-0 left-0 w-0 h-px bg-gradient-to-r from-primary to-primary-light
-            transition-all duration-300 group-hover:w-full"
-          aria-hidden="true"
-        />
-      </span>
-    </Component>
-  );
-};
-
-const ContactInfo = ({ icon: Icon, children }: { icon: LucideIcon; children: React.ReactNode }) => (
-  <div className="flex items-center gap-3 text-foreground-alt">
-    <Icon className="w-5 h-5 text-primary" />
-    <span>{children}</span>
-  </div>
-);
-
-const Footer: React.FC = () => {
-  const currentYear = new Date().getFullYear();
+const Footer = () => {
   const [showCookieSettings, setShowCookieSettings] = useState(false);
-  const location = useLocation();
-  const isDashboard = location.pathname.includes('/dashboard');
+  const scrollTo = useScrollTo();
+  const currentYear = new Date().getFullYear();
+
+  const handleNavigation = (section: string) => {
+    scrollTo(section);
+  };
 
   return (
     <>
-      <footer
-        className={`relative mt-auto border-t border-primary/10 bg-background/80 backdrop-blur-xl
-          ${isDashboard ? 'pb-safe-bottom lg:pb-8' : 'pb-8'}`}
-        aria-label="Footer"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20">
+      <footer className="relative mt-auto border-t border-primary/10 bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Main Footer Content */}
-          <div className="grid gap-12 lg:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-12 pb-12">
-            {/* Branding & Contact Section */}
-            <div className="lg:col-span-5 space-y-8">
-              <div className="space-y-4">
-                <h3 className="text-2xl sm:text-3xl font-light">
-                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">
-                    Nordic Code
-                  </span>
-                  <span className="text-foreground">Works</span>
-                </h3>
-                <p className="text-foreground-alt max-w-md leading-relaxed">
-                  Creating innovative digital solutions with Nordic precision and modern technology.
-                  We transform complex ideas into elegant, secure, and scalable solutions.
-                </p>
+          <div className="py-12 lg:py-16">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+              {/* Brand Section */}
+              <div className="lg:col-span-4">
+                <div className="space-y-8">
+                  {/* Logo */}
+                  <div>
+                    <h3 className="text-2xl font-light">
+                      <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">
+                        Nordic Code
+                      </span>
+                      <span className="text-foreground">Works</span>
+                    </h3>
+                    <p className="mt-4 text-sm text-muted-foreground max-w-md">
+                      Creating innovative digital solutions with Nordic precision and modern technology.
+                    </p>
+                  </div>
+
+                  {/* Contact Info */}
+                  <div className="space-y-3">
+                    {[
+                      { icon: MapPin, text: 'Stockholm, Sweden' },
+                      { icon: Phone, text: '+46 (0) 70 123 4567' },
+                      { icon: Mail, text: 'contact@nordiccodeworks.com' }
+                    ].map(({ icon: Icon, text }) => (
+                      <div key={text} className="flex items-center gap-3 text-sm text-muted-foreground">
+                        <Icon className="w-4 h-4 text-primary" />
+                        <span>{text}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Social Links */}
+                  <div className="flex gap-3">
+                    <SocialLink href="#" icon={Github} label="GitHub" />
+                    <SocialLink href="#" icon={Linkedin} label="LinkedIn" />
+                    <SocialLink href="#" icon={X} label="X (Twitter)" />
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-4">
-                <ContactInfo icon={MapPin}>
-                  Stockholm, Sweden
-                </ContactInfo>
-                <ContactInfo icon={Phone}>
-                  +46 (0) 70 123 4567
-                </ContactInfo>
-                <ContactInfo icon={Mail}>
-                  contact@nordiccodeworks.com
-                </ContactInfo>
-              </div>
+              {/* Navigation & Links */}
+              <div className="lg:col-span-8">
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3">
+                  {/* Quick Links */}
+                  <div className="space-y-6">
+                    <h4 className="text-sm font-medium text-foreground">Navigation</h4>
+                    <ul className="space-y-3">
+                      {[
+                        { label: 'Services', section: 'services' },
+                        { label: 'Portfolio', section: 'portfolio' },
+                        { label: 'Contact', section: 'contact' }
+                      ].map(({ label, section }) => (
+                        <li key={section}>
+                          <button
+                            onClick={() => handleNavigation(section)}
+                            className="group text-sm text-muted-foreground hover:text-foreground transition-colors duration-300 flex items-center gap-2"
+                          >
+                            <span>{label}</span>
+                            <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-              <div className="flex gap-4">
-                <SocialLink href="#" icon={Github} label="GitHub" />
-                <SocialLink href="#" icon={Linkedin} label="LinkedIn" />
-                <SocialLink href="#" icon={X} label="X (formerly Twitter)" />
-              </div>
-            </div>
+                  {/* Resources */}
+                  <div className="space-y-6">
+                    <h4 className="text-sm font-medium text-foreground">Resources</h4>
+                    <ul className="space-y-3">
+                      {[
+                        { label: 'Documentation', href: '/docs' },
+                        { label: 'Blog', href: '/blog' },
+                        { label: 'Careers', href: '/careers' }
+                      ].map(({ label, href }) => (
+                        <li key={href}>
+                          <Link
+                            to={href}
+                            className="group text-sm text-muted-foreground hover:text-foreground transition-colors duration-300 flex items-center gap-2"
+                          >
+                            <span>{label}</span>
+                            <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-            {/* Links Sections */}
-            <div className="lg:col-span-7 space-y-8">
-              {/* Quick Links Section */}
-              <div className="space-y-6">
-                <h4 className="text-lg font-light text-foreground">
-                  Quick Links
-                </h4>
-                <nav aria-label="Footer quick links">
-                  <ul className="flex flex-wrap gap-x-8 gap-y-4">
-                    <li>
-                      <FooterLink href="/services">
-                        <FileCode className="w-4 h-4 mr-2" aria-hidden="true" />
-                        Services
-                      </FooterLink>
-                    </li>
-                    <li>
-                      <FooterLink href="/portfolio">
-                        <Briefcase className="w-4 h-4 mr-2" aria-hidden="true" />
-                        Portfolio
-                      </FooterLink>
-                    </li>
-                    <li>
-                      <FooterLink href="/contact">
-                        <MessageCircle className="w-4 h-4 mr-2" aria-hidden="true" />
-                        Contact
-                      </FooterLink>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-
-              {/* Resources Section */}
-              <div className="space-y-6">
-                <h4 className="text-lg font-light text-foreground">
-                  Resources
-                </h4>
-                <nav aria-label="Footer resources">
-                  <ul className="flex flex-wrap gap-x-8 gap-y-4">
-                    <li>
-                      <FooterLink href="/blog">
-                        Blog
-                        <ArrowUpRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                      </FooterLink>
-                    </li>
-                    <li>
-                      <FooterLink href="/documentation">
-                        Documentation
-                        <ArrowUpRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                      </FooterLink>
-                    </li>
-                    <li>
-                      <FooterLink href="/careers">
-                        Careers
-                        <ArrowUpRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                      </FooterLink>
-                    </li>
-                  </ul>
-                </nav>
+                  {/* Legal */}
+                  <div className="space-y-6">
+                    <h4 className="text-sm font-medium text-foreground">Legal</h4>
+                    <ul className="space-y-3">
+                      <li>
+                        <Link
+                          to="/privacy"
+                          className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+                        >
+                          Privacy Policy
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/terms"
+                          className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+                        >
+                          Terms of Service
+                        </Link>
+                      </li>
+                      <li>
+                        <button
+                          onClick={() => setShowCookieSettings(true)}
+                          className="group text-sm text-muted-foreground hover:text-foreground transition-colors duration-300 flex items-center gap-2"
+                        >
+                          <Cookie className="w-4 h-4" />
+                          <span>Cookie Settings</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Bottom Bar */}
-          <div className="pt-8 border-t border-primary/10">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-sm text-foreground-alt order-2 sm:order-1">
-                © {currentYear} Nordic Code Works. All rights reserved.
-              </p>
-              <nav className="flex flex-wrap justify-center gap-6 order-1 sm:order-2" aria-label="Footer legal links">
-                <FooterLink href="/privacy">Privacy Policy</FooterLink>
-                <FooterLink href="/terms">Terms of Service</FooterLink>
-                <FooterLink
-                  onClick={() => setShowCookieSettings(true)}
-                  external
-                >
-                  <span className="inline-flex items-center">
-                    <Cookie className="w-4 h-4 mr-2" aria-hidden="true" />
-                    Cookie Settings
-                  </span>
-                </FooterLink>
-              </nav>
+          <div className="flex flex-col sm:flex-row items-center justify-between py-6 border-t border-primary/10 gap-4">
+            <p className="text-sm text-muted-foreground">
+              © {currentYear} Nordic Code Works. All rights reserved.
+            </p>
+            <div className="flex items-center gap-6">
+              <Link
+                to="/privacy"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+              >
+                Privacy
+              </Link>
+              <Link
+                to="/terms"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+              >
+                Terms
+              </Link>
             </div>
           </div>
         </div>

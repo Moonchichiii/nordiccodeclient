@@ -93,7 +93,7 @@ export default {
           },
         },
         dark: {
-          bg: '#1A1A1A',
+          bg: '#2A2A2A',
           text: '#FFFFFF',
           accent: '#FF6F61',
           secondary: '#6B5B95',

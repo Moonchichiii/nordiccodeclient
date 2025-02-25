@@ -5,7 +5,7 @@ import AuthModal from '@/features/auth/components/AuthModal';
 import { gsap } from 'gsap';
 import { NavLink as RouterLink, useLocation } from 'react-router-dom';
 import { useScrollTo } from '@/hooks/useScrollTo';
-
+import logo from '@assets/images/applogo.webp';
 
 interface NavLinkProps {
   href: string;
@@ -42,7 +42,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, isScrollingUp, isHomeVisible, showHamburger }) => {
-  const scrollTo = useScrollTo(); 
+  const scrollTo = useScrollTo();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -120,46 +120,32 @@ const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, isScrollingUp, isHo
       >
         <div className="mx-auto max-w-[1920px] px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <RouterLink to="/" className="flex items-center gap-3 group" aria-label="Return to homepage">
-              <svg
-                width="48"
-                height="48"
-                viewBox="0 0 200 200"
-                xmlns="http://www.w3.org/2000/svg"
-                className="transition-transform duration-300 group-hover:scale-110"
+            {/* Logo with mobile-specific positioning */}
+            <div className="flex items-center gap-3">
+              <RouterLink 
+                to="/" 
+                className="flex items-center gap-3 group relative md:ml-0 ml-12" 
+                aria-label="Return to homepage"
               >
-                <path
-                  d="
-                    M 50,150
-                    C 40,110  60,70   50,50
-                    L 150,150              
-                    C 140,110  160,70   150,50
-                  "
-                  fill="none"
-                  stroke="currentColor"
-                  className="text-background"
-                  strokeWidth="32"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <img
+                  src={logo}
+                  alt="Logo"
+                  width={88}
+                  height={88}
+                  className="transition-transform duration-300 group-hover:scale-110"
                 />
-                <path
-                  d="
-                    M 50,150
-                    C 40,110  60,70   50,50
-                    L 150,150
-                    C 140,110  160,70  150,50
-                  "
-                  fill="none"
-                  stroke="currentColor"
-                  className="text-primary"
-                  strokeWidth="28"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </RouterLink>
-            {/* Desktop Navigation */}
+              </RouterLink>
+            </div>
+
+            {/* Mobile Hamburger - Always visible */}
+            <button
+              className="md:hidden absolute left-6 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-primary/10 transition-colors"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="w-6 h-6 text-primary" />
+            </button>
+
+            {/* Rest of the header content stays exactly the same */}
             <nav className="hidden lg:flex items-center gap-8">
               <NavLink href="#services" onClick={() => scrollTo('services')}>
                 Services
@@ -171,7 +157,6 @@ const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, isScrollingUp, isHo
                 Contact
               </NavLink>
             </nav>
-            {/* Desktop Auth & Theme */}
             <div className="hidden lg:flex items-center gap-6">
               <button
                 onClick={toggleTheme}
@@ -212,6 +197,8 @@ const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, isScrollingUp, isHo
           </div>
         </div>
       </header>
+
+      {/* Rest of the component stays exactly the same */}
       {/* Hamburger Menu Button */}
       <button
         ref={hamburgerRef}

@@ -7,6 +7,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import BackToTop from "@/components/layout/BackToTop";
 import LoadingScreen from "@/components/ui/LoadingScreen";
+import AiChatbot from "@/features/aichatbot/AiChatBot";
 import { throttle } from "@/utils/throttle";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -112,6 +113,7 @@ const Layout = () => {
           </Suspense>
         )}
       </main>
+      <AiChatbot />
       <BackToTop />
       <Footer />
     </div>

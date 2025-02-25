@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuthContext } from '@/features/auth/components/AuthProvider';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { useTheme } from '@/components/layout/useTheme';
+import { useTheme } from '@/components/layout/ThemeContext';
 import {
   FolderCog,
   LayoutGrid,
@@ -19,9 +19,11 @@ import {
   LogOut,
   Sun,
   Moon,
+  X
 } from 'lucide-react';
 import clsx from 'clsx';
 import DashboardRoutes from '@/pages/dashboard/DashboardRoutes';
+import logo from '@assets/images/applogo.webp';
 
 function Dashboard() {
   const { theme, toggleTheme } = useTheme();
@@ -30,6 +32,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [hasActiveProject, setHasActiveProject] = useState(false); // You'll need to implement this based on your project state
   const sidebarRef = useRef<HTMLElement>(null);
 
   // Close sidebar when clicking outside of it
@@ -88,7 +91,6 @@ function Dashboard() {
   }
 
   return (
-    // The data-theme attribute here ensures your CSS responds to the theme change
     <div className="flex min-h-screen bg-background" data-theme={theme}>
       <aside
         ref={sidebarRef}
@@ -103,9 +105,17 @@ function Dashboard() {
           'lg:static lg:translate-x-0 lg:pointer-events-auto'
         )}
       >
+        {/* Sidebar content stays the same */}
         <div className="hidden lg:flex items-center space-x-4 px-6 py-8">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <img src="/src/assets/images/applogo.png" alt="Nordic Code Works" className="h-6 w-6" />
+          <div className="h-30 w-30  flex items-center justify-center">
+            {/* Logo */}
+            <img
+              src={logo}
+              alt="Logo"
+              width={88}
+              height={88}
+              className="transition-transform duration-300 group-hover:scale-110"
+            />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Nordic Code Works</h1>
@@ -166,19 +176,19 @@ function Dashboard() {
       </aside>
 
       <div className="flex-1 flex flex-col">
-        <header className="fixed top-0 right-0 left-0 lg:left-72 z-20 flex items-center px-6 py-4 bg-background/95 backdrop-blur-md border-b border-border/50 h-16">
-          <div className="flex items-center space-x-3 lg:hidden">
-            <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <img src="/src/assets/images/applogo.png" alt="Nordic Code Works" className="h-5 w-5" />
+        <header className="fixed top-0 right-0 left-0 lg:left-72 z-20 flex items-center px-4 py-4 bg-background/95 backdrop-blur-md border-b border-border/50 h-16">
+          <div className="flex items-center space-x-2 lg:hidden">
+            <div className="h-8 w-8 rounded-lg flex items-center justify-center">
+              <img src="/src/assets/images/applogo.webp" alt="Nordic Code Works" className="h-6 w-6" />
             </div>
-            <span className="text-lg font-semibold text-foreground">Dashboard</span>
+            <span className="text-base font-medium text-foreground">Dashboard</span>
           </div>
 
           <div className="ml-auto flex items-center space-x-4">
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="p-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="p-2.5 rounded-xl bg-card border border-border hover:border-primary/50 transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
               {theme === 'dark' ? (
@@ -187,10 +197,14 @@ function Dashboard() {
                 <Moon className="w-5 h-5 text-primary" aria-hidden="true" />
               )}
             </button>
-            <button className="relative p-2 rounded-xl bg-background-alt hover:bg-background-alt/80 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 group">
-              <Bell className="h-5 w-5 text-foreground-alt group-hover:text-primary transition-colors" />
-              <span className="absolute top-2 right-2 h-2 w-2 bg-primary rounded-full"></span>
-            </button>
+
+            {/* Notification Button - Only show in desktop */}
+            <div className="hidden lg:block">
+              <button className="relative p-2 rounded-xl bg-card border border-border hover:border-primary/50 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 group">
+                <Bell className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                <span className="absolute top-2 right-2 h-2 w-2 bg-primary rounded-full"></span>
+              </button>
+            </div>
           </div>
         </header>
 
@@ -198,32 +212,42 @@ function Dashboard() {
           <DashboardRoutes />
         </main>
 
-        <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border/50 lg:hidden z-50">
+        {/* Mobile Navigation Bar */}
+        <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border lg:hidden z-50">
           <div className="flex justify-around items-center h-16 max-w-lg mx-auto px-4">
             {[
-              { icon: Home, label: 'Overview', path: '/dashboard' },
+              { icon: Menu, label: 'Menu', onClick: () => setIsSidebarOpen(true) },
               { icon: Mail, label: 'Messages', path: '/dashboard/messages' },
-              { icon: Bell, label: 'Alerts', path: '#', hasNotification: true },
-              { icon: Menu, label: 'More', onClick: () => setIsSidebarOpen(true) },
+              hasActiveProject
+                ? { icon: FileText, label: 'Documents', path: '/dashboard/documents' }
+                : { icon: FolderCog, label: 'Start Project', path: '/dashboard/project-selection' },
+              { icon: Home, label: 'Overview', path: '/dashboard' }
             ].map((item, index) => (
               <button
                 key={index}
-                onClick={item.onClick || (() => navigate(item.path))}
+                onClick={item.onClick || (() => navigate(item.path!))}
                 className={clsx(
                   'flex flex-col items-center justify-center w-16 p-2 rounded-lg transition-colors relative',
-                  location.pathname === item.path
+                  item.path && location.pathname === item.path
                     ? 'text-primary'
-                    : 'text-foreground-alt hover:text-primary'
+                    : 'text-muted-foreground hover:text-primary'
                 )}
               >
                 <item.icon className="h-5 w-5" />
                 <span className="text-xs mt-1">{item.label}</span>
-                {item.hasNotification && (
-                  <span className="absolute top-1 right-3 h-2 w-2 bg-primary rounded-full"></span>
-                )}
               </button>
             ))}
           </div>
+
+          {/* Close Sidebar Button - Only visible when sidebar is open on mobile */}
+          {isSidebarOpen && (
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-lg bg-card border border-border hover:border-primary/50 transition-colors text-muted-foreground hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          )}
         </nav>
       </div>
     </div>

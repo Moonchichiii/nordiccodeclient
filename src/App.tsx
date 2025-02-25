@@ -8,6 +8,7 @@ import Layout from '@/components/layout/Layout';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import ProtectedRoute from '@/features/auth/ProtectedRoute';
 import CookieConsent from '@/components/common/CookieConsent';
+import { ThemeProvider } from '@/components/layout/ThemeContext';
 
 interface LazyComponent<T> extends React.LazyExoticComponent<T> {
   preload: () => Promise<{ default: T }>;
@@ -26,13 +27,14 @@ const lazyWithPrefetch = <T extends React.ComponentType<any>>(
 // Lazy load components
 const EmailConfirmationModal = lazyWithPrefetch(() => import('@/features/auth/components/EmailConfirmationModal'));
 const Dashboard = lazyWithPrefetch(() => import('@/pages/dashboard/Dashboard'));
-const Settings = lazyWithPrefetch(() => import('@/pages/settings/Settings'));
+const Settings = lazyWithPrefetch(() => import('@/features/settings/pages/Settings'));
 const NotFound = lazyWithPrefetch(() => import('@/pages/error/NotFound'));
 
 const App = (): ReactElement => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+      <ThemeProvider>
         <AuthProvider>
           <div className="relative">
             <Suspense fallback={<LoadingScreen />}>
@@ -77,6 +79,7 @@ const App = (): ReactElement => {
             <CookieConsent />
           </div>
         </AuthProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

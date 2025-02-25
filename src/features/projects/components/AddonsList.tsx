@@ -1,3 +1,4 @@
+// src/features/projects/components/shared/AddonsList.tsx
 import { CheckCircle2 } from 'lucide-react';
 import { Addon } from '@/features/projects/types/types';
 
@@ -17,11 +18,7 @@ const AddonsList: React.FC<AddonsListProps> = ({ addons, selectedAddons, isEnter
         return (
           <div
             key={addon.id}
-            onClick={() => {
-              if (!included) {
-                onToggle(addon.id);
-              }
-            }}
+            onClick={() => { if (!included) onToggle(addon.id); }}
             className={`w-full p-4 rounded-xl border transition-all duration-200 text-left ${
               included
                 ? 'border-green-500 bg-green-500/10 cursor-not-allowed'
@@ -31,21 +28,14 @@ const AddonsList: React.FC<AddonsListProps> = ({ addons, selectedAddons, isEnter
             }`}
           >
             <div className="flex items-start gap-4">
-              <CheckCircle2
-                className={`w-5 h-5 mt-0.5 ${
-                  included
-                    ? 'text-green-500'
-                    : selectedAddons.has(addon.id)
-                    ? 'text-yellow-500'
-                    : 'text-gray-500'
-                }`}
-              />
+              <CheckCircle2 className={`w-5 h-5 mt-0.5 ${
+                included ? 'text-green-500' :
+                selectedAddons.has(addon.id) ? 'text-yellow-500' : 'text-gray-500'
+              }`} />
               <div className="flex-grow">
                 <h4 className="text-white font-medium">
                   {addon.title}{' '}
-                  {included && (
-                    <span className="text-xs text-green-400 ml-2">(Included in Enterprise)</span>
-                  )}
+                  {included && <span className="text-xs text-green-400 ml-2">(Included in Enterprise)</span>}
                 </h4>
                 <p className="text-sm text-gray-400 mt-1">{addon.description}</p>
               </div>
